@@ -1,5 +1,7 @@
 # ✂️ Cut the Cable
 
+[![tests](https://github.com/Avalon2222/cut-the-cable/actions/workflows/tests.yml/badge.svg)](https://github.com/Avalon2222/cut-the-cable/actions/workflows/tests.yml) [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cut-the-cable.streamlit.app)
+
 > Peta kabel internet bawah laut yang menghubungkan Indonesia ke dunia dan antar pulau, lengkap dengan simulasi:
 > **kalau satu kabel, satu landing station, atau satu area laut bermasalah, daerah mana yang kehilangan jalur?**
 > Dibangun dari data publik Submarine Cable Map (TeleGeography) dengan Python, pandas, networkx, Plotly, dan Streamlit.
