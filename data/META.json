@@ -1,0 +1,13 @@
+{
+  "dibangun": "2026-11-05",
+  "sumber": "https://www.submarinecablemap.com/api/v3",
+  "n_kabel_dunia": 713,
+  "n_kabel": 118,
+  "n_kabel_per_kategori": {
+    "domestik": 44,
+    "transit": 44,
+    "internasional": 30
+  },
+  "n_landing": 361,
+  "n_landing_indonesia": 146
+}
