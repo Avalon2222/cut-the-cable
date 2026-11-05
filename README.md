@@ -6,10 +6,20 @@
 > **kalau satu kabel, satu landing station, atau satu area laut bermasalah, daerah mana yang kehilangan jalur?**
 > Dibangun dari data publik Submarine Cable Map (TeleGeography) dengan Python, pandas, networkx, Plotly, dan Streamlit.
 
-*Cut one cable. Watch who goes dark. An interactive map of the submarine cables that connect Indonesia to the world
-and to itself, with a what-if simulator: cut a cable, knock out a landing station, or hit one stretch of sea, and see
-which coastal towns lose their route out. Built from TeleGeography's public cable data with Python, networkx, Plotly
-and Streamlit.*
+## 🇬🇧 In English
+
+**Cut one cable. Watch who goes dark.** An interactive map of the 118 submarine cables that connect Indonesia to the world and to itself, with a what-if simulator: cut a cable, knock out a landing station, or hit one stretch of sea, and see which coastal towns lose their route out.
+
+- **Simulate** four kinds of failure, from a single cable to a whole sea area like the Sunda Strait.
+- **Model** the network as a graph (networkx) and find which landing stations get cut off.
+- **See** where Indonesia's international cables actually land, country by country.
+- **Spot** the weak points: landing stations that hang on a single cable.
+
+**Built with:** Python, networkx, pandas, Plotly, Streamlit  
+**Data:** TeleGeography Submarine Cable Map (public), with a script that rebuilds the dataset  
+**Engineering:** Graph and scenario modules covered by pytest, CI on GitHub Actions
+
+*The rest of this README is in Indonesian.*
 
 **🚀 Coba langsung di browser:** [cut-the-cable.streamlit.app](https://cut-the-cable.streamlit.app)
 
