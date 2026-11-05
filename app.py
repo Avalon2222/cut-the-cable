@@ -90,7 +90,8 @@ per_landing = (
          n_internasional=("kategori", lambda s: int((s == "internasional").sum())),
          daftar_kabel=("nama", lambda s: "; ".join(sorted(s))))
 )
-landing = data.landing.join(per_landing, on="id")
+# Kolom n_kabel di CSV menghitung semua kabel dunia; di sini dihitung ulang hanya dari kabel yang mendarat di Indonesia.
+landing = data.landing.drop(columns=["n_kabel", "n_kabel_aktif"]).join(per_landing, on="id")
 landing[["n_kabel", "n_internasional"]] = landing[["n_kabel", "n_internasional"]].fillna(0).astype(int)
 landing["daftar_kabel"] = landing["daftar_kabel"].fillna("(hanya kabel rencana)")
 landing_idn = landing[landing["negara"] == "Indonesia"].copy()

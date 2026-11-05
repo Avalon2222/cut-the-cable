@@ -12,7 +12,8 @@ Yang dilakukan:
        - "transit":  tidak mendarat tetapi lintasannya melewati kotak perairan Indonesia
   4. Simpan ke data/:
        kabel.csv            satu baris per kabel (mendarat + transit)
-       landing_station.csv  satu baris per landing station yang tersentuh kabel di atas
+       landing_station.csv  satu baris per landing station yang tersentuh kabel di atas,
+                            termasuk jumlah kabel (semua kabel dunia yang mendarat di sana)
        kabel_landing.csv    tabel relasi kabel <-> landing station (bentuk panjang)
        kabel_geo.json       GeoJSON garis kabel (hanya subset relevan, agar repo tetap kecil)
        META.json            tanggal pembuatan dan jumlah baris
@@ -141,9 +142,14 @@ def main() -> None:
             )
 
     nama_negara_landing = {}
+    n_kabel: dict[str, int] = {}
+    n_kabel_aktif: dict[str, int] = {}
     for k in kabel_detail:
         for l in k["landing_points"]:
             nama_negara_landing[l["id"]] = (l["name"], l["country"])
+            n_kabel[l["id"]] = n_kabel.get(l["id"], 0) + 1
+            if not k["is_planned"]:
+                n_kabel_aktif[l["id"]] = n_kabel_aktif.get(l["id"], 0) + 1
 
     baris_landing = []
     for lid in sorted(id_landing_terpakai):
@@ -159,6 +165,8 @@ def main() -> None:
                 "lat": lat,
                 "lon": lon,
                 "wilayah": wilayah.tentukan_wilayah(lat, lon) if negara == "Indonesia" and lat is not None else "",
+                "n_kabel_aktif": n_kabel_aktif.get(lid, 0),
+                "n_kabel": n_kabel.get(lid, 0),
                 "url": f"https://www.submarinecablemap.com/landing-point/{lid}",
             }
         )

@@ -24,7 +24,7 @@ Semua data dalam proyek ini publik. Tidak ada yang berasal dari akun berbayar at
 | File | Isi | Kolom penting |
 |---|---|---|
 | `kabel.csv` | Satu baris per kabel yang relevan untuk Indonesia | `kategori` (internasional / domestik / transit), `status` (aktif / rencana), `tahun_rfs`, `panjang_km`, `pemilik`, `pemasok`, `n_landing`, `n_landing_indonesia`, `negara` (dipisah `\|`) |
-| `landing_station.csv` | Satu baris per landing station yang disinggahi kabel di atas (Indonesia dan luar negeri) | `kota`, `negara`, `lat`, `lon`, `wilayah` (hanya Indonesia, dari `src/wilayah.py`) |
+| `landing_station.csv` | Satu baris per landing station yang disinggahi kabel di atas (Indonesia dan luar negeri) | `kota`, `negara`, `lat`, `lon`, `wilayah` (hanya Indonesia, dari `src/wilayah.py`), `n_kabel_aktif` dan `n_kabel` (jumlah kabel dunia yang mendarat di sana, termasuk yang tidak menyentuh Indonesia) |
 | `kabel_landing.csv` | Relasi banyak-ke-banyak kabel ↔ landing station | `id_kabel`, `id_landing`, `urutan` (urutan seperti di sumber) |
 | `kabel_geo.json` | GeoJSON garis untuk kabel di `kabel.csv` saja (bukan 713 kabel dunia), agar repo tetap kecil | `properties.id`, `nama`, `kategori`, `status` |
 | `META.json` | Tanggal pembuatan dan jumlah baris | |
