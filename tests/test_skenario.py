@@ -83,3 +83,31 @@ def test_area_preset_pada_data_sungguhan():
     ids = skenario.kabel_lewat_kotak(d, batam)
     assert "batam-singapore-cable-system-bscs" in ids
     assert len(ids) >= 10
+
+
+def test_kotak_memuat_dan_pusat():
+    k = skenario.Kotak("uji", 100, 110, -5, 5)
+    assert k.memuat(100, -5) and k.memuat(110, 5)        # tepi ikut dihitung
+    assert not k.memuat(110.01, 0)
+    assert k.pusat() == (105, 0)
+
+
+def test_garis_lewat_kotak_multiline_dan_titik_tunggal():
+    k = skenario.Kotak("uji", 0, 10, 0, 10)
+    jauh = [[-20, -20], [-15, -20]]
+    lewat = [[-5, 5], [15, 5]]
+    assert skenario.garis_lewat_kotak([jauh, lewat], k)   # cukup satu bagian yang lewat
+    assert not skenario.garis_lewat_kotak([jauh], k)
+    assert skenario.garis_lewat_kotak([[[5, 5]]], k)      # garis satu titik di dalam kotak
+    assert not skenario.garis_lewat_kotak([[[50, 5]]], k)
+    assert not skenario.garis_lewat_kotak([], k)
+
+
+def test_area_preset_valid():
+    nama = [k.nama for k in skenario.AREA_PRESET]
+    assert len(nama) == len(set(nama))
+    for k in skenario.AREA_PRESET:
+        assert k.lon_min < k.lon_max and k.lat_min < k.lat_max, k.nama
+        # semua area preset ada di sekitar Indonesia
+        assert 94 <= k.lon_min and k.lon_max <= 142 and -12 <= k.lat_min and k.lat_max <= 7, k.nama
+        assert k.keterangan

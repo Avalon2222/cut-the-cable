@@ -173,3 +173,14 @@ def test_data_sungguhan_konsisten():
     hasil = jaringan.simulasi(d, set())
     assert (hasil["status"] == "Aman").all()
     assert json.dumps(d.meta)  # META.json terbaca
+
+
+def test_kabel_per_tahun_data_asli():
+    from src.muat_data import muat_semua
+    d = muat_semua()
+    t = jaringan.kabel_per_tahun(d)
+    k = d.kabel[d.kabel["kategori"].isin(["domestik", "internasional"])]
+    assert t["jumlah"].sum() == k["tahun_rfs"].notna().sum()   # kabel transit tidak ikut
+    assert t["tahun_rfs"].is_monotonic_increasing
+    assert t["tahun_rfs"].dtype.kind == "i"
+    assert set(t["kategori"]) <= {"domestik", "internasional"}
