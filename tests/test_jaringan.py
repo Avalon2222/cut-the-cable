@@ -184,3 +184,25 @@ def test_kabel_per_tahun_data_asli():
     assert t["tahun_rfs"].is_monotonic_increasing
     assert t["tahun_rfs"].dtype.kind == "i"
     assert set(t["kategori"]) <= {"domestik", "internasional"}
+
+
+def test_kabel_aktif_tanpa_rencana_dan_transit(data):
+    ids = set(jaringan.kabel_aktif(data)["id"])
+    assert ids == {"int-1", "int-2", "dom-1", "dom-2", "dom-3", "dom-4"}
+
+
+def test_kabel_aktif_bisa_menyertakan_rencana(data):
+    ids = set(jaringan.kabel_aktif(data, sertakan_rencana=True)["id"])
+    assert "int-3" in ids       # kabel rencana ikut kalau diminta
+    assert "tr-1" not in ids    # kabel transit tetap tidak pernah masuk
+
+
+def test_data_center_punya_koordinat_valid():
+    from src.muat_data import muat_data_center
+
+    dc = muat_data_center()
+    assert len(dc) > 0
+    assert dc[["lat", "lon"]].notna().all().all()
+    # Semua lokasi harus jatuh di sekitar kepulauan Indonesia.
+    assert dc["lat"].between(-11, 6).all()
+    assert dc["lon"].between(95, 141).all()
