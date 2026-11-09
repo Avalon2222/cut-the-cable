@@ -206,3 +206,22 @@ def test_data_center_punya_koordinat_valid():
     # Semua lokasi harus jatuh di sekitar kepulauan Indonesia.
     assert dc["lat"].between(-11, 6).all()
     assert dc["lon"].between(95, 141).all()
+
+
+def test_komponen_internasional_dan_pintu_keluar():
+    data = buat_data_mainan()
+    G = jaringan.bangun_graf(data)
+    asing = jaringan._komponen_internasional(G)
+    assert asing["sby"] and asing["btm"]          # tersambung ke Singapura lewat Jakarta/Batam
+    assert not asing["mtw"] and not asing["pdg"]  # pulau kecil yang terpisah
+    assert not asing["mnd"]                       # kabel ke Guam masih rencana
+
+    pintu = jaringan._pintu_keluar(G, {"int-1", "int-2", "int-3"})
+    assert pintu["sby"] == 2 and pintu["sg"] == 2
+    assert pintu["pdg"] == 0 and pintu["mnd"] == 0
+
+
+def test_pintu_keluar_berkurang_saat_kabel_putus():
+    data = buat_data_mainan()
+    G = jaringan.bangun_graf(data, putus=["int-2"])
+    assert jaringan._pintu_keluar(G, {"int-1", "int-2"})["jkt"] == 1
