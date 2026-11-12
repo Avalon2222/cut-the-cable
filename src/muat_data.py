@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 
 import pandas as pd
@@ -40,11 +41,20 @@ class Data:
     def kabel_dari_landing(self, id_landing: str) -> list[str]:
         return self.relasi.loc[self.relasi["id_landing"] == id_landing, "id_kabel"].tolist()
 
+    @cached_property
+    def _nama_kabel(self) -> dict[str, str]:
+        return self.kabel.set_index("id")["nama"].to_dict()
+
+    @cached_property
+    def _nama_landing(self) -> dict[str, str]:
+        return self.landing.set_index("id")["nama"].to_dict()
+
     def nama_kabel(self, id_kabel: str) -> str:
-        return self.kabel.set_index("id")["nama"].get(id_kabel, id_kabel)
+        """Nama kabel, atau id-nya sendiri bila tidak ditemukan. Tabel id -> nama dibuat sekali saja."""
+        return self._nama_kabel.get(id_kabel, id_kabel)
 
     def nama_landing(self, id_landing: str) -> str:
-        return self.landing.set_index("id")["nama"].get(id_landing, id_landing)
+        return self._nama_landing.get(id_landing, id_landing)
 
 
 def muat_semua(folder: Path = DATA) -> Data:
