@@ -52,3 +52,49 @@ def test_kategori_kabel_tidak_relevan():
     assert bd.kategori_kabel([_lp("Japan"), _lp("United States")], _geo([140.0, 35.0], [-120.0, 34.0])) is None
     assert bd.kategori_kabel([_lp("Japan")], None) is None
     assert bd.kategori_kabel([], None) is None
+
+
+def test_main_dengan_api_tiruan(tmp_path, monkeypatch):
+    import json
+
+    def kabel(id_, planned, *landing):
+        return {"id": id_, "name": id_.upper(), "is_planned": planned, "rfs_year": 2020, "rfs": "2020 Q1",
+                "length": "1,000 km", "owners": "A", "suppliers": "B",
+                "landing_points": [{"id": l, "name": f"{l.title()}, {n}", "country": n} for l, n in landing]}
+
+    detail = {
+        "jaya": kabel("jaya", False, ("jakarta", "Indonesia"), ("batam", "Indonesia")),
+        "lintas": kabel("lintas", True, ("batam", "Indonesia"), ("changi", "Singapore")),
+        "jauh": kabel("jauh", False, ("tokyo", "Japan"), ("la", "United States")),
+    }
+    respons = {
+        "cable/all.json": [{"id": k} for k in detail],
+        "cable/cable-geo.json": {"features": [
+            {"properties": {"id": "jaya", "color": "#f00"}, "geometry": {"coordinates": [[[106.8, -6.1], [104.0, 1.1]]]}},
+        ]},
+        "landing-point/landing-point-geo.json": {"features": [
+            {"properties": {"id": "jakarta"}, "geometry": {"coordinates": [106.8, -6.1]}},
+            {"properties": {"id": "batam"}, "geometry": {"coordinates": [104.0, 1.1]}},
+        ]},
+    }
+
+    def palsu(url):
+        jalur = url.removeprefix(bd.API + "/")
+        if jalur in respons:
+            return respons[jalur]
+        return detail[jalur.removeprefix("cable/").removesuffix(".json")]
+
+    monkeypatch.setattr(bd, "ambil_json", palsu)
+    monkeypatch.setattr(bd, "DATA", tmp_path)
+    bd.main()
+
+    meta = json.loads((tmp_path / "META.json").read_text(encoding="utf-8"))
+    assert meta["n_kabel_dunia"] == 3 and meta["n_kabel"] == 2
+    assert meta["n_kabel_per_kategori"] == {"domestik": 1, "internasional": 1}
+    assert meta["n_landing_indonesia"] == 2
+    landing = (tmp_path / "landing_station.csv").read_text(encoding="utf-8")
+    # Batam dilewati dua kabel, tapi cuma satu yang sudah aktif.
+    baris_batam = next(b for b in landing.splitlines() if b.startswith("batam,"))
+    assert ",1,2," in baris_batam
+    geo = json.loads((tmp_path / "kabel_geo.json").read_text(encoding="utf-8"))
+    assert [f["properties"]["id"] for f in geo["features"]] == ["jaya"]
