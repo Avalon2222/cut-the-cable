@@ -239,3 +239,13 @@ def test_ringkas_angka_hasil_kosong():
     kosong = pd.DataFrame(columns=["n_kabel_awal", "status", "pintu_awal", "pintu_sisa"])
     angka = jaringan.ringkas_angka(kosong)
     assert angka["n_landing"] == 0 and angka["pintu_awal"] == 0 and angka["pintu_sisa"] == 0
+
+
+def test_ringkas_wilayah_persen_terdampak(data):
+    hasil = jaringan.simulasi(data, {"int-1", "int-2"}, radius_darat_km=0)
+    tabel = jaringan.ringkas_wilayah(hasil)
+    assert (tabel["Total"] == tabel[list(jaringan.STATUS)].sum(axis=1)).all()
+    assert (tabel["Terdampak"] == tabel["Total"] - tabel["Aman"]).all()
+    assert tabel["% terdampak"].between(0, 100).all()
+    # Wilayah paling parah ada di urutan teratas.
+    assert tabel["Terputus / gelap"].is_monotonic_decreasing
