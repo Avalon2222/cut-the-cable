@@ -225,3 +225,17 @@ def test_pintu_keluar_berkurang_saat_kabel_putus():
     data = buat_data_mainan()
     G = jaringan.bangun_graf(data, putus=["int-2"])
     assert jaringan._pintu_keluar(G, {"int-1", "int-2"})["jkt"] == 1
+
+
+def test_ringkas_angka_tanpa_pemutusan_semua_aman(data):
+    hasil = jaringan.simulasi(data, set(), radius_darat_km=0)
+    angka = jaringan.ringkas_angka(hasil)
+    assert angka["aman"] == angka["n_landing"] > 0
+    assert angka["gelap"] == angka["terputus"] == angka["rentan"] == 0
+    assert angka["pintu_sisa"] == angka["pintu_awal"]
+
+
+def test_ringkas_angka_hasil_kosong():
+    kosong = pd.DataFrame(columns=["n_kabel_awal", "status", "pintu_awal", "pintu_sisa"])
+    angka = jaringan.ringkas_angka(kosong)
+    assert angka["n_landing"] == 0 and angka["pintu_awal"] == 0 and angka["pintu_sisa"] == 0
