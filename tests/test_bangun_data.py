@@ -31,3 +31,24 @@ def test_lewat_kotak_pakai_urutan_lon_lat():
     assert bd.lewat_kotak(lewat)
     assert not bd.lewat_kotak(tidak)
     assert not bd.lewat_kotak([])
+
+
+def _lp(negara):
+    return {"country": negara}
+
+
+def _geo(*titik):
+    return {"geometry": {"coordinates": [list(titik)]}}
+
+
+def test_kategori_kabel_domestik_internasional_transit():
+    assert bd.kategori_kabel([_lp("Indonesia"), _lp("Indonesia")], None) == "domestik"
+    assert bd.kategori_kabel([_lp("Indonesia"), _lp("Singapore")], None) == "internasional"
+    # Tidak mendarat, tapi garisnya lewat Laut Jawa (lon, lat).
+    assert bd.kategori_kabel([_lp("Singapore"), _lp("Australia")], _geo([104.0, 1.0], [110.0, -5.0])) == "transit"
+
+
+def test_kategori_kabel_tidak_relevan():
+    assert bd.kategori_kabel([_lp("Japan"), _lp("United States")], _geo([140.0, 35.0], [-120.0, 34.0])) is None
+    assert bd.kategori_kabel([_lp("Japan")], None) is None
+    assert bd.kategori_kabel([], None) is None

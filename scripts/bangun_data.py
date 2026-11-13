@@ -75,6 +75,21 @@ def lewat_kotak(koordinat_multiline) -> bool:
     return False
 
 
+def kategori_kabel(landing: list[dict], geo: dict | None) -> str | None:
+    """
+    'domestik' bila semua landing di Indonesia, 'internasional' bila sebagian, 'transit' bila tidak mendarat
+    tapi garisnya lewat perairan Indonesia, dan None bila kabel tidak relevan sama sekali.
+    """
+    n_idn = sum(1 for l in landing if l["country"] == "Indonesia")
+    if n_idn and n_idn == len(landing):
+        return "domestik"
+    if n_idn:
+        return "internasional"
+    if geo is not None and lewat_kotak(geo["geometry"]["coordinates"]):
+        return "transit"
+    return None
+
+
 def main() -> None:
     print("1/4 mengunduh daftar kabel dan geometri ...")
     daftar = ambil_json(f"{API}/cable/all.json")
@@ -100,16 +115,9 @@ def main() -> None:
         negara = sorted({l["country"] for l in landing})
         n_idn = sum(1 for l in landing if l["country"] == "Indonesia")
         g = geometri.get(k["id"])
-        mendarat = n_idn > 0
-        transit = (not mendarat) and g is not None and lewat_kotak(g["geometry"]["coordinates"])
-        if not (mendarat or transit):
+        kategori = kategori_kabel(landing, g)
+        if kategori is None:
             continue
-        if mendarat and n_idn == len(landing):
-            kategori = "domestik"
-        elif mendarat:
-            kategori = "internasional"
-        else:
-            kategori = "transit"
         baris_kabel.append(
             {
                 "id": k["id"],
