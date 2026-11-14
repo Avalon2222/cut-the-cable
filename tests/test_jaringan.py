@@ -258,3 +258,13 @@ def test_graf_tanpa_sisi_ke_diri_sendiri_untuk_landing_dobel():
     G = jaringan.bangun_graf(d)
     assert not any(a == b for a, b in G.edges())
     assert G["jkt"]["sby"]["kabel"] == {"dom-2"}
+
+
+def test_relasi_ke_landing_tak_dikenal_dilewati():
+    d = buat_data_mainan()
+    d.relasi = pd.concat([d.relasi, pd.DataFrame([("dom-2", "hantu", 2)], columns=["id_kabel", "id_landing", "urutan"])],
+                         ignore_index=True)
+    G = jaringan.bangun_graf(d)
+    assert "hantu" not in G
+    hasil = jaringan.simulasi(d, {"int-1"})
+    assert len(hasil) == (d.landing["negara"] == "Indonesia").sum()
