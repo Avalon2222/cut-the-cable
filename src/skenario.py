@@ -80,7 +80,9 @@ def kabel_ke_negara(data: Data, negara: str, hanya_aktif: bool = True) -> set[st
     k = data.kabel[(data.kabel["kategori"] == "internasional")]
     if hanya_aktif:
         k = k[k["status"] == "aktif"]
-    return set(k.loc[k["negara"].str.split("|").apply(lambda n: negara in n), "id"])
+    # Spasi di sekitar "|" (hasil edit CSV manual) dan sel kosong tidak boleh membuat kabel terlewat.
+    mendarat = k["negara"].fillna("").str.split("|").apply(lambda n: negara.strip() in {x.strip() for x in n})
+    return set(k.loc[mendarat, "id"])
 
 
 def segmen_memotong_kotak(p1: tuple[float, float], p2: tuple[float, float], kotak: Kotak) -> bool:

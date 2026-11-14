@@ -134,3 +134,10 @@ def test_kabel_lewat_kotak_terima_linestring_dan_geometri_kosong(data):
     assert skenario.kabel_lewat_kotak(data, batam) == {"int-1"}
     jawa = Kotak("Laut Jawa", 108.0, 110.0, -7.0, -6.0)
     assert skenario.kabel_lewat_kotak(data, jawa) == set()
+
+
+def test_kabel_ke_negara_abaikan_spasi_dan_sel_kosong(data):
+    data.kabel.loc[data.kabel["id"] == "int-1", "negara"] = "Indonesia | Singapore"
+    data.kabel.loc[data.kabel["id"] == "int-2", "negara"] = None
+    assert skenario.kabel_ke_negara(data, "Singapore") == {"int-1"}
+    assert skenario.kabel_ke_negara(data, " Singapore ") == {"int-1"}
