@@ -200,7 +200,10 @@ def simulasi(data: Data, putus: Iterable[str], sertakan_rencana: bool = False,
                 "pintu_sisa": pintu1.get(r.id, 0),
             }
         )
-    df = pd.DataFrame(baris)
+    # Kolom ditulis eksplisit supaya data tanpa landing Indonesia tetap menghasilkan tabel kosong yang utuh.
+    kolom = ["id", "nama", "kota", "wilayah", "lat", "lon", "n_kabel_awal", "n_kabel_sisa", "kabel_hilang",
+             "internasional_awal", "internasional_sisa", "pintu_awal", "pintu_sisa"]
+    df = pd.DataFrame(baris, columns=kolom)
     df["status"] = [
         tentukan_status(a, s, ia, is_) for a, s, ia, is_ in
         zip(df["n_kabel_awal"], df["n_kabel_sisa"], df["internasional_awal"], df["internasional_sisa"])
