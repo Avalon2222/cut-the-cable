@@ -268,3 +268,12 @@ def test_relasi_ke_landing_tak_dikenal_dilewati():
     assert "hantu" not in G
     hasil = jaringan.simulasi(d, {"int-1"})
     assert len(hasil) == (d.landing["negara"] == "Indonesia").sum()
+
+
+def test_simulasi_tanpa_landing_indonesia_hasil_kosong_utuh():
+    d = buat_data_mainan()
+    d.landing = d.landing[d.landing["negara"] != "Indonesia"].reset_index(drop=True)
+    hasil = jaringan.simulasi(d, {"int-1"})
+    assert hasil.empty
+    assert {"status", "n_kabel_awal", "wilayah"} <= set(hasil.columns)
+    assert jaringan.ringkas_angka(hasil)["n_landing"] == 0
