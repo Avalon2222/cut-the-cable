@@ -108,7 +108,8 @@ def bangun_graf(data: Data, putus: Iterable[str] = (), sertakan_rencana: bool = 
     for id_kabel, grup in relasi.groupby("id_kabel"):
         if id_kabel in putus:
             continue
-        simpul = grup.sort_values("urutan")["id_landing"].tolist()
+        # Landing yang tercatat dua kali di satu kabel tidak boleh jadi sisi ke dirinya sendiri.
+        simpul = list(dict.fromkeys(grup.sort_values("urutan")["id_landing"]))
         for a, b in combinations(simpul, 2):
             if G.has_edge(a, b):
                 G[a][b]["kabel"].add(id_kabel)

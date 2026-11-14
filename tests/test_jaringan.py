@@ -249,3 +249,12 @@ def test_ringkas_wilayah_persen_terdampak(data):
     assert tabel["% terdampak"].between(0, 100).all()
     # Wilayah paling parah ada di urutan teratas.
     assert tabel["Terputus / gelap"].is_monotonic_decreasing
+
+
+def test_graf_tanpa_sisi_ke_diri_sendiri_untuk_landing_dobel():
+    d = buat_data_mainan()
+    d.relasi = pd.concat([d.relasi, pd.DataFrame([("dom-2", "jkt", 2)], columns=["id_kabel", "id_landing", "urutan"])],
+                         ignore_index=True)
+    G = jaringan.bangun_graf(d)
+    assert not any(a == b for a, b in G.edges())
+    assert G["jkt"]["sby"]["kabel"] == {"dom-2"}
