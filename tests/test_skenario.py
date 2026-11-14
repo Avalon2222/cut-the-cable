@@ -124,3 +124,13 @@ def test_semua_area_preset_valid():
     for k in skenario.AREA_PRESET:
         lon, lat = k.pusat()
         assert k.memuat(lon, lat)
+
+
+def test_kabel_lewat_kotak_terima_linestring_dan_geometri_kosong(data):
+    data.geo["features"][0]["geometry"] = {"type": "LineString",
+                                           "coordinates": [[104.0, 1.1], [103.8, 1.3]]}
+    data.geo["features"][1]["geometry"] = None
+    batam = Kotak("Batam", 103.5, 104.5, 0.9, 1.5)
+    assert skenario.kabel_lewat_kotak(data, batam) == {"int-1"}
+    jawa = Kotak("Laut Jawa", 108.0, 110.0, -7.0, -6.0)
+    assert skenario.kabel_lewat_kotak(data, jawa) == set()

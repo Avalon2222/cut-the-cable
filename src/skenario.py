@@ -110,6 +110,17 @@ def segmen_memotong_kotak(p1: tuple[float, float], p2: tuple[float, float], kota
     return t0 <= t1
 
 
+def _daftar_garis(geometri: dict | None) -> list:
+    """Ambil daftar garis dari geometri GeoJSON. LineString dibungkus jadi satu garis, sisanya kosong."""
+    if not geometri:
+        return []
+    if geometri.get("type") == "LineString":
+        return [geometri.get("coordinates") or []]
+    if geometri.get("type") == "MultiLineString":
+        return geometri.get("coordinates") or []
+    return []
+
+
 def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
     """True bila ada satu ruas saja dari MultiLineString yang memotong kotak."""
     for garis in koordinat_multiline:
@@ -123,8 +134,9 @@ def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
 
 def kabel_lewat_kotak(data: Data, kotak: Kotak, hanya_aktif: bool = True, sertakan_transit: bool = False) -> set[str]:
     """Id kabel yang garisnya melewati kotak. Kabel kawasan (transit) hanya ikut bila diminta."""
-    status = data.kabel.set_index("id")["status"].to_dict()
-    kategori = data.kabel.set_index("id")["kategori"].to_dict()
+    per_id = data.kabel.set_index("id")
+    status = per_id["status"].to_dict()
+    kategori = per_id["kategori"].to_dict()
     hasil = set()
     for f in data.geo["features"]:
         cid = f["properties"]["id"]
@@ -132,6 +144,6 @@ def kabel_lewat_kotak(data: Data, kotak: Kotak, hanya_aktif: bool = True, sertak
             continue
         if not sertakan_transit and kategori.get(cid) == "transit":
             continue
-        if garis_lewat_kotak(f["geometry"]["coordinates"], kotak):
+        if garis_lewat_kotak(_daftar_garis(f.get("geometry")), kotak):
             hasil.add(cid)
     return hasil
