@@ -111,3 +111,16 @@ def test_area_preset_valid():
         # semua area preset ada di sekitar Indonesia
         assert 94 <= k.lon_min and k.lon_max <= 142 and -12 <= k.lat_min and k.lat_max <= 7, k.nama
         assert k.keterangan
+
+
+def test_kotak_terbalik_ditolak():
+    with pytest.raises(ValueError, match="terbalik"):
+        Kotak("Salah", lon_min=106.0, lon_max=105.0, lat_min=-6.0, lat_max=-5.0)
+    with pytest.raises(ValueError, match="terbalik"):
+        Kotak("Salah", lon_min=105.0, lon_max=106.0, lat_min=-5.0, lat_max=-6.0)
+
+
+def test_semua_area_preset_valid():
+    for k in skenario.AREA_PRESET:
+        lon, lat = k.pusat()
+        assert k.memuat(lon, lat)

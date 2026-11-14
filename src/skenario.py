@@ -30,6 +30,13 @@ class Kotak:
     lat_max: float
     keterangan: str = ""
 
+    def __post_init__(self) -> None:
+        if self.lon_min > self.lon_max or self.lat_min > self.lat_max:
+            raise ValueError(
+                f"Kotak '{self.nama}' terbalik: batas minimum harus lebih kecil dari maksimum "
+                f"(lon {self.lon_min}..{self.lon_max}, lat {self.lat_min}..{self.lat_max})"
+            )
+
     def memuat(self, lon: float, lat: float) -> bool:
         return self.lon_min <= lon <= self.lon_max and self.lat_min <= lat <= self.lat_max
 
