@@ -141,3 +141,10 @@ def test_kabel_ke_negara_abaikan_spasi_dan_sel_kosong(data):
     data.kabel.loc[data.kabel["id"] == "int-2", "negara"] = None
     assert skenario.kabel_ke_negara(data, "Singapore") == {"int-1"}
     assert skenario.kabel_ke_negara(data, " Singapore ") == {"int-1"}
+
+
+def test_garis_lewat_kotak_menerima_koordinat_ketinggian():
+    k = Kotak("uji", 0, 10, 0, 10)
+    garis_3d = [[[-5.0, 5.0, 0.0], [15.0, 5.0, -120.0]]]   # (lon, lat, ketinggian)
+    assert skenario.garis_lewat_kotak(garis_3d, k)
+    assert not skenario.garis_lewat_kotak([[[-5.0, 20.0, 0.0], [15.0, 20.0, 0.0]]], k)

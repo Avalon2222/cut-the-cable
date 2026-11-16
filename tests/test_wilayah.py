@@ -63,3 +63,8 @@ def test_kotak_indonesia():
     assert wilayah.di_kotak_indonesia(1.3, 103.8)        # Singapura sengaja ikut (kabel kawasan)
     assert not wilayah.di_kotak_indonesia(35.7, 139.7)   # Tokyo
     assert not wilayah.di_kotak_indonesia(-33.9, 151.2)  # Sydney
+
+
+@pytest.mark.parametrize("lat, lon", [(float("nan"), 104.0), (1.1, float("nan")), (None, None)])
+def test_koordinat_kosong_tidak_dianggap_sumatra(lat, lon):
+    assert wilayah.tentukan_wilayah(lat, lon) == ""
