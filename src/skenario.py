@@ -150,7 +150,9 @@ def kabel_lewat_kotak(data: Data, kotak: Kotak, hanya_aktif: bool = True, sertak
     kategori = per_id["kategori"].to_dict()
     hasil = set()
     for f in data.geo["features"]:
-        cid = f["properties"]["id"]
+        cid = (f.get("properties") or {}).get("id")
+        if cid is None:
+            continue   # fitur GeoJSON tanpa id tidak bisa dicocokkan ke tabel kabel
         if hanya_aktif and status.get(cid) != "aktif":
             continue
         if not sertakan_transit and kategori.get(cid) == "transit":
