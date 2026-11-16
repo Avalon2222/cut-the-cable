@@ -124,8 +124,12 @@ def _daftar_garis(geometri: dict | None) -> list:
 
 
 def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
-    """True bila ada satu ruas saja dari MultiLineString yang memotong kotak."""
+    """True bila ada satu ruas saja dari MultiLineString yang memotong kotak.
+
+    Titik GeoJSON boleh punya koordinat ketiga (ketinggian); yang dipakai hanya lon dan lat.
+    """
     for garis in koordinat_multiline:
+        garis = [tuple(titik[:2]) for titik in garis]
         for (x1, y1), (x2, y2) in zip(garis[:-1], garis[1:]):
             if segmen_memotong_kotak((x1, y1), (x2, y2), kotak):
                 return True
