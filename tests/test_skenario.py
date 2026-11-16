@@ -155,3 +155,14 @@ def test_kotak_dengan_batas_nan_ditolak():
         Kotak("Kosong", lon_min=float("nan"), lon_max=106.0, lat_min=-6.0, lat_max=-5.0)
     with pytest.raises(ValueError, match="kosong"):
         Kotak("Tak hingga", lon_min=105.0, lon_max=106.0, lat_min=-6.0, lat_max=float("inf"))
+
+
+def test_kabel_lewat_kotak_lewati_fitur_tanpa_id(data):
+    garis = {"type": "LineString", "coordinates": [[104.0, 1.1], [103.8, 1.3]]}
+    data.geo["features"] = [
+        {"type": "Feature", "properties": {}, "geometry": garis},
+        {"type": "Feature", "properties": None, "geometry": garis},
+        {"type": "Feature", "properties": {"id": "int-1"}, "geometry": garis},
+    ]
+    batam = Kotak("Batam", 103.5, 104.5, 0.9, 1.5)
+    assert skenario.kabel_lewat_kotak(data, batam) == {"int-1"}
