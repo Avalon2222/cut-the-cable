@@ -35,8 +35,9 @@ class Data:
 
     # --- pencarian cepat -----------------------------------------------------------------
     def landing_dari_kabel(self, id_kabel: str) -> list[str]:
-        r = self.relasi[self.relasi["id_kabel"] == id_kabel].sort_values("urutan")
-        return r["id_landing"].tolist()
+        r = self.relasi[self.relasi["id_kabel"] == id_kabel].sort_values("urutan", kind="mergesort")
+        # Landing yang tercatat dua kali untuk kabel yang sama cukup muncul sekali, di urutan pertamanya.
+        return list(dict.fromkeys(r["id_landing"]))
 
     def kabel_dari_landing(self, id_landing: str) -> list[str]:
         return self.relasi.loc[self.relasi["id_landing"] == id_landing, "id_kabel"].tolist()
