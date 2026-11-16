@@ -214,7 +214,9 @@ def simulasi(data: Data, putus: Iterable[str], sertakan_rencana: bool = False,
 
 def ringkas_wilayah(hasil: pd.DataFrame) -> pd.DataFrame:
     """Agregasi hasil simulasi per wilayah: jumlah landing station per status dan persen terdampak."""
-    aktif = hasil[hasil["n_kabel_awal"] > 0]
+    aktif = hasil[hasil["n_kabel_awal"] > 0].copy()
+    # Landing tanpa wilayah (koordinat kosong) dikumpulkan di satu baris berlabel, bukan baris tanpa nama.
+    aktif["wilayah"] = aktif["wilayah"].fillna("").replace("", "Tidak diketahui")
     tabel = pd.crosstab(aktif["wilayah"], aktif["status"], dropna=False).reindex(columns=STATUS, fill_value=0)
     tabel["Total"] = tabel.sum(axis=1)
     tabel["Terdampak"] = tabel["Total"] - tabel["Aman"]

@@ -277,3 +277,11 @@ def test_simulasi_tanpa_landing_indonesia_hasil_kosong_utuh():
     assert hasil.empty
     assert {"status", "n_kabel_awal", "wilayah"} <= set(hasil.columns)
     assert jaringan.ringkas_angka(hasil)["n_landing"] == 0
+
+
+def test_ringkas_wilayah_label_wilayah_kosong(data):
+    data.landing.loc[data.landing["id"] == "pdg", "wilayah"] = ""
+    data.landing.loc[data.landing["id"] == "mtw", "wilayah"] = None
+    tabel = jaringan.ringkas_wilayah(jaringan.simulasi(data, set()))
+    assert "" not in tabel.index
+    assert tabel.loc["Tidak diketahui", "Total"] == 2
