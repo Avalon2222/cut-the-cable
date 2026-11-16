@@ -41,7 +41,11 @@ def tentukan_wilayah(lat: float, lon: float) -> str:
     'Jawa'
     >>> tentukan_wilayah(1.1, 104.0)    # Batam
     'Sumatra & Kepulauan Riau'
+
+    Koordinat kosong (NaN/None) menghasilkan string kosong, bukan jatuh ke Sumatra.
     """
+    if lat is None or lon is None or lat != lat or lon != lon:
+        return ""
     # 1. Papua: semua yang di timur 135° BT, plus kepala burung (Sorong, Fakfak, Kaimana, Timika)
     if lon >= 135.0 or (lon >= 130.3 and lat >= -4.7):
         return "Papua"
