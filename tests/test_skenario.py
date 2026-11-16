@@ -148,3 +148,10 @@ def test_garis_lewat_kotak_menerima_koordinat_ketinggian():
     garis_3d = [[[-5.0, 5.0, 0.0], [15.0, 5.0, -120.0]]]   # (lon, lat, ketinggian)
     assert skenario.garis_lewat_kotak(garis_3d, k)
     assert not skenario.garis_lewat_kotak([[[-5.0, 20.0, 0.0], [15.0, 20.0, 0.0]]], k)
+
+
+def test_kotak_dengan_batas_nan_ditolak():
+    with pytest.raises(ValueError, match="kosong"):
+        Kotak("Kosong", lon_min=float("nan"), lon_max=106.0, lat_min=-6.0, lat_max=-5.0)
+    with pytest.raises(ValueError, match="kosong"):
+        Kotak("Tak hingga", lon_min=105.0, lon_max=106.0, lat_min=-6.0, lat_max=float("inf"))

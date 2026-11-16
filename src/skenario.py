@@ -15,6 +15,7 @@ mengecek titik sudut garis, supaya kotak kecil yang dilintasi segmen panjang tet
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from .muat_data import Data
@@ -31,6 +32,10 @@ class Kotak:
     keterangan: str = ""
 
     def __post_init__(self) -> None:
+        batas = (self.lon_min, self.lon_max, self.lat_min, self.lat_max)
+        if not all(math.isfinite(b) for b in batas):
+            # NaN lolos dari perbandingan di bawah dan membuat kotak diam-diam tidak memuat apa pun.
+            raise ValueError(f"Kotak '{self.nama}' punya batas kosong atau tak hingga: {batas}")
         if self.lon_min > self.lon_max or self.lat_min > self.lat_max:
             raise ValueError(
                 f"Kotak '{self.nama}' terbalik: batas minimum harus lebih kecil dari maksimum "
