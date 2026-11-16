@@ -44,3 +44,9 @@ def test_muat_data_center():
     dc = muat_data.muat_data_center()
     assert not dc.empty
     assert dc[["lat", "lon"]].notna().all().all()
+
+
+def test_landing_dari_kabel_tanpa_duplikat():
+    d = buat_data_mainan()
+    d.relasi = pd.DataFrame({"id_kabel": ["k", "k", "k", "k"], "id_landing": ["a", "b", "a", "c"], "urutan": [0, 1, 1, 2]})
+    assert d.landing_dari_kabel("k") == ["a", "b", "c"]
