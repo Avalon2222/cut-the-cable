@@ -31,6 +31,11 @@ KOTAK_INDONESIA = (94.0, 142.0, -12.0, 8.0)
 
 
 def di_kotak_indonesia(lat: float, lon: float) -> bool:
+    """True bila titik ada di kotak perairan Indonesia. Koordinat kosong (None, NaN, pd.NA) -> False."""
+    try:
+        lat, lon = float(lat), float(lon)
+    except (TypeError, ValueError):
+        return False   # pd.NA tidak bisa dibandingkan langsung ("boolean value of NA is ambiguous")
     lon_min, lon_max, lat_min, lat_max = KOTAK_INDONESIA
     return lon_min <= lon <= lon_max and lat_min <= lat <= lat_max
 
