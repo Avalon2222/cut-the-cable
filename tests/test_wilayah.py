@@ -1,5 +1,6 @@
 """Uji pembagian wilayah dari koordinat."""
 
+import pandas as pd
 import pytest
 
 from src import wilayah
@@ -77,3 +78,11 @@ def test_koordinat_pd_na_dan_teks_tidak_error():
     assert wilayah.tentukan_wilayah(-6.1, pd.NA) == ""
     assert wilayah.tentukan_wilayah("-6.1", "106.8") == "Jawa"
     assert wilayah.tentukan_wilayah("", "106.8") == ""
+
+
+def test_di_kotak_indonesia_koordinat_kosong():
+    assert wilayah.di_kotak_indonesia(-6.1, 106.8)
+    assert not wilayah.di_kotak_indonesia(pd.NA, 106.8)
+    assert not wilayah.di_kotak_indonesia(None, None)
+    assert not wilayah.di_kotak_indonesia(float("nan"), 106.8)
+    assert wilayah.di_kotak_indonesia("-6.1", "106.8")
