@@ -85,8 +85,11 @@ def kabel_ke_negara(data: Data, negara: str, hanya_aktif: bool = True) -> set[st
     k = data.kabel[(data.kabel["kategori"] == "internasional")]
     if hanya_aktif:
         k = k[k["status"] == "aktif"]
-    # Spasi di sekitar "|" (hasil edit CSV manual) dan sel kosong tidak boleh membuat kabel terlewat.
-    mendarat = k["negara"].fillna("").str.split("|").apply(lambda n: negara.strip() in {x.strip() for x in n})
+    dicari = (negara or "").strip().casefold()
+    if not dicari:
+        return set()   # tanpa nama negara, sel kosong di CSV jangan sampai dianggap cocok
+    # Spasi di sekitar "|" (hasil edit CSV manual), beda huruf besar, dan sel kosong tidak boleh membuat kabel terlewat.
+    mendarat = k["negara"].fillna("").str.split("|").apply(lambda n: dicari in {x.strip().casefold() for x in n})
     return set(k.loc[mendarat, "id"])
 
 

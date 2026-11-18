@@ -166,3 +166,10 @@ def test_kabel_lewat_kotak_lewati_fitur_tanpa_id(data):
     ]
     batam = Kotak("Batam", 103.5, 104.5, 0.9, 1.5)
     assert skenario.kabel_lewat_kotak(data, batam) == {"int-1"}
+
+
+def test_kabel_ke_negara_kosong_dan_beda_huruf(data):
+    data.kabel.loc[data.kabel["id"] == "int-2", "negara"] = None
+    assert skenario.kabel_ke_negara(data, "") == set()
+    assert skenario.kabel_ke_negara(data, "  ") == set()
+    assert skenario.kabel_ke_negara(data, "singapore") == {"int-1"}
