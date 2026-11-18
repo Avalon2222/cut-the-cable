@@ -68,3 +68,12 @@ def test_kotak_indonesia():
 @pytest.mark.parametrize("lat, lon", [(float("nan"), 104.0), (1.1, float("nan")), (None, None)])
 def test_koordinat_kosong_tidak_dianggap_sumatra(lat, lon):
     assert wilayah.tentukan_wilayah(lat, lon) == ""
+
+
+def test_koordinat_pd_na_dan_teks_tidak_error():
+    import pandas as pd
+
+    assert wilayah.tentukan_wilayah(pd.NA, 106.8) == ""
+    assert wilayah.tentukan_wilayah(-6.1, pd.NA) == ""
+    assert wilayah.tentukan_wilayah("-6.1", "106.8") == "Jawa"
+    assert wilayah.tentukan_wilayah("", "106.8") == ""
