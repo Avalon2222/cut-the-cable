@@ -71,6 +71,10 @@ def muat_semua(folder: Path = DATA) -> Data:
 
     kabel["tahun_rfs"] = pd.to_numeric(kabel["tahun_rfs"], errors="coerce").astype("Int64")
     kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
+    # Status dan kategori dibandingkan persis ("aktif", "internasional"); suntingan manual seperti
+    # "Aktif " atau "INTERNASIONAL" jangan sampai membuat kabel keluar dari graf diam-diam.
+    for kolom in ("status", "kategori"):
+        kabel[kolom] = kabel[kolom].fillna("").astype(str).str.strip().str.lower()
     kabel["negara"] = kabel["negara"].fillna("")
     kabel["pemilik"] = kabel["pemilik"].fillna("")
     kabel["pemasok"] = kabel["pemasok"].fillna("")

@@ -1,5 +1,7 @@
 """Uji pembacaan data/ dan pencarian cepat di kelas Data."""
 
+import shutil
+
 import pandas as pd
 
 from src import muat_data
@@ -56,3 +58,16 @@ def test_kabel_dari_landing_tanpa_duplikat():
     d = buat_data_mainan()
     d.relasi = pd.DataFrame({"id_kabel": ["k1", "k1", "k2"], "id_landing": ["a", "a", "a"], "urutan": [0, 2, 0]})
     assert d.kabel_dari_landing("a") == ["k1", "k2"]
+
+
+def test_muat_semua_status_dan_kategori_dirapikan(tmp_path):
+    for nama in ("kabel.csv", "landing_station.csv", "kabel_landing.csv", "kabel_geo.json", "META.json"):
+        shutil.copy(muat_data.DATA / nama, tmp_path / nama)
+    kabel = pd.read_csv(tmp_path / "kabel.csv")
+    asli = muat_data.muat_semua()
+    kabel["status"] = kabel["status"].str.upper() + " "
+    kabel["kategori"] = " " + kabel["kategori"].str.title()
+    kabel.to_csv(tmp_path / "kabel.csv", index=False)
+    d = muat_data.muat_semua(tmp_path)
+    assert list(d.kabel["status"]) == list(asli.kabel["status"])
+    assert list(d.kabel["kategori"]) == list(asli.kabel["kategori"])
