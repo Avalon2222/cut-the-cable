@@ -40,7 +40,9 @@ class Data:
         return list(dict.fromkeys(r["id_landing"]))
 
     def kabel_dari_landing(self, id_landing: str) -> list[str]:
-        return self.relasi.loc[self.relasi["id_landing"] == id_landing, "id_kabel"].tolist()
+        ids = self.relasi.loc[self.relasi["id_landing"] == id_landing, "id_kabel"]
+        # Kabel yang mencatat landing ini dua kali tetap dihitung satu kabel.
+        return list(dict.fromkeys(ids))
 
     @cached_property
     def _nama_kabel(self) -> dict[str, str]:
