@@ -121,6 +121,21 @@ def segmen_memotong_kotak(p1: tuple[float, float], p2: tuple[float, float], kota
     return t0 <= t1
 
 
+def _ruas_tanpa_lompat_antimeridian(p1: tuple[float, float], p2: tuple[float, float]) -> list:
+    """Pecah ruas yang melintasi garis 180° menjadi dua ruas di sisi masing-masing.
+
+    Ruas 179,5 -> -179,5 sebenarnya hanya sepanjang 1°, tetapi kalau diuji apa adanya ia dianggap
+    membentang 359° ke arah barat dan "memotong" kotak mana pun di lintang yang sama.
+    """
+    (x1, y1), (x2, y2) = p1, p2
+    if abs(x2 - x1) <= 180:
+        return [(p1, p2)]
+    x2_lanjut = x2 + 360 if x2 < x1 else x2 - 360
+    batas = 180.0 if x2_lanjut > x1 else -180.0
+    y_batas = y1 + (y2 - y1) * (batas - x1) / (x2_lanjut - x1)
+    return [((x1, y1), (batas, y_batas)), ((-batas, y_batas), (x2, y2))]
+
+
 def _daftar_garis(geometri: dict | None) -> list:
     """Ambil daftar garis dari geometri GeoJSON. LineString dibungkus jadi satu garis, sisanya kosong."""
     if not geometri:
@@ -142,8 +157,8 @@ def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
         garis = [tuple(titik[:2]) for titik in garis or []
                  if titik is not None and len(titik) >= 2
                  and all(isinstance(v, (int, float)) and math.isfinite(v) for v in titik[:2])]
-        for (x1, y1), (x2, y2) in pairwise(garis):
-            if segmen_memotong_kotak((x1, y1), (x2, y2), kotak):
+        for a, b in pairwise(garis):
+            if any(segmen_memotong_kotak(r1, r2, kotak) for r1, r2 in _ruas_tanpa_lompat_antimeridian(a, b)):
                 return True
         if len(garis) == 1 and kotak.memuat(*garis[0]):
             return True

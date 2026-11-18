@@ -180,3 +180,12 @@ def test_garis_lewat_kotak_abaikan_titik_rusak():
     garis = [[[-5.0, 5.0], None, [float("nan"), 5.0], [15.0, 5.0]], None]
     assert skenario.garis_lewat_kotak(garis, k)
     assert not skenario.garis_lewat_kotak([[[20.0, 20.0], [None, None], [30.0, 30.0]]], k)
+
+
+def test_ruas_lintas_antimeridian_tidak_membentang_ke_seluruh_dunia():
+    ruas = [[[179.5, 20.0], [-179.5, 21.0]]]
+    assert not skenario.garis_lewat_kotak(ruas, skenario.Kotak("Laut Cina Selatan", 100, 110, 19, 22))
+    # Kotak yang benar-benar dilintasi di sekitar 180° tetap terdeteksi, di kedua sisi.
+    assert skenario.garis_lewat_kotak(ruas, skenario.Kotak("Barat 180", 179.8, 180, 19, 22))
+    assert skenario.garis_lewat_kotak(ruas, skenario.Kotak("Timur 180", -180, -179.8, 19, 22))
+    assert skenario.garis_lewat_kotak([[[-179.5, 21.0], [179.5, 20.0]]], skenario.Kotak("Balik", 179.8, 180, 19, 22))
