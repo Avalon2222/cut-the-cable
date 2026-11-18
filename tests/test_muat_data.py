@@ -50,3 +50,9 @@ def test_landing_dari_kabel_tanpa_duplikat():
     d = buat_data_mainan()
     d.relasi = pd.DataFrame({"id_kabel": ["k", "k", "k", "k"], "id_landing": ["a", "b", "a", "c"], "urutan": [0, 1, 1, 2]})
     assert d.landing_dari_kabel("k") == ["a", "b", "c"]
+
+
+def test_kabel_dari_landing_tanpa_duplikat():
+    d = buat_data_mainan()
+    d.relasi = pd.DataFrame({"id_kabel": ["k1", "k1", "k2"], "id_landing": ["a", "a", "a"], "urutan": [0, 2, 0]})
+    assert d.kabel_dari_landing("a") == ["k1", "k2"]
