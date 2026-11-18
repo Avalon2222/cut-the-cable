@@ -173,3 +173,10 @@ def test_kabel_ke_negara_kosong_dan_beda_huruf(data):
     assert skenario.kabel_ke_negara(data, "") == set()
     assert skenario.kabel_ke_negara(data, "  ") == set()
     assert skenario.kabel_ke_negara(data, "singapore") == {"int-1"}
+
+
+def test_garis_lewat_kotak_abaikan_titik_rusak():
+    k = Kotak("uji", 0, 10, 0, 10)
+    garis = [[[-5.0, 5.0], None, [float("nan"), 5.0], [15.0, 5.0]], None]
+    assert skenario.garis_lewat_kotak(garis, k)
+    assert not skenario.garis_lewat_kotak([[[20.0, 20.0], [None, None], [30.0, 30.0]]], k)

@@ -137,7 +137,10 @@ def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
     Titik GeoJSON boleh punya koordinat ketiga (ketinggian); yang dipakai hanya lon dan lat.
     """
     for garis in koordinat_multiline:
-        garis = [tuple(titik[:2]) for titik in garis]
+        # Titik rusak (None, kurang dari dua angka, NaN) dibuang supaya tidak membuat ruas palsu.
+        garis = [tuple(titik[:2]) for titik in garis or []
+                 if titik is not None and len(titik) >= 2
+                 and all(isinstance(v, (int, float)) and math.isfinite(v) for v in titik[:2])]
         for (x1, y1), (x2, y2) in zip(garis[:-1], garis[1:]):
             if segmen_memotong_kotak((x1, y1), (x2, y2), kotak):
                 return True
