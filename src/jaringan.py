@@ -229,7 +229,7 @@ def ringkas_angka(hasil: pd.DataFrame) -> dict:
     """Angka-angka besar untuk kartu metrik."""
     aktif = hasil[hasil["n_kabel_awal"] > 0]
     return {
-        "n_landing": int(len(aktif)),
+        "n_landing": len(aktif),
         "gelap": int((aktif["status"] == "Gelap total").sum()),
         "terputus": int((aktif["status"] == "Terputus dari dunia").sum()),
         "darat": int((aktif["status"] == "Hidup lewat darat").sum()),

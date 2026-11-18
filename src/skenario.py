@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from itertools import pairwise
 
 from .muat_data import Data
 
@@ -141,7 +142,7 @@ def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
         garis = [tuple(titik[:2]) for titik in garis or []
                  if titik is not None and len(titik) >= 2
                  and all(isinstance(v, (int, float)) and math.isfinite(v) for v in titik[:2])]
-        for (x1, y1), (x2, y2) in zip(garis[:-1], garis[1:]):
+        for (x1, y1), (x2, y2) in pairwise(garis):
             if segmen_memotong_kotak((x1, y1), (x2, y2), kotak):
                 return True
         if len(garis) == 1 and kotak.memuat(*garis[0]):
