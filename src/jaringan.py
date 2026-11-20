@@ -56,6 +56,12 @@ PENJELASAN_STATUS = {
 URUTAN_KEPARAHAN = {s: i for i, s in enumerate(STATUS)}
 
 
+def _peta_nama_kabel(kabel: pd.DataFrame) -> dict[str, str]:
+    """id -> nama kabel. Nama kosong diganti id-nya, karena NaN membuat sorted()/join() gagal."""
+    nama = kabel["nama"].where(kabel["nama"].notna() & (kabel["nama"].astype(str).str.strip() != ""), kabel["id"])
+    return dict(zip(kabel["id"], nama.astype(str)))
+
+
 def kabel_aktif(data: Data, sertakan_rencana: bool = False) -> pd.DataFrame:
     """Kabel yang dihitung dalam graf: yang mendarat di Indonesia (domestik + internasional), aktif
     kecuali diminta ikut menyertakan rencana. Kabel kawasan (transit) tidak masuk graf karena
@@ -173,7 +179,7 @@ def simulasi(data: Data, putus: Iterable[str], sertakan_rencana: bool = False,
     putus = set(putus)
     kabel = kabel_aktif(data, sertakan_rencana)
     kabel_int = set(kabel.loc[kabel["kategori"] == "internasional", "id"])
-    nama_kabel = kabel.set_index("id")["nama"].to_dict()
+    nama_kabel = _peta_nama_kabel(kabel)
 
     G0 = bangun_graf(data, (), sertakan_rencana, radius_darat_km)
     G1 = bangun_graf(data, putus, sertakan_rencana, radius_darat_km)
