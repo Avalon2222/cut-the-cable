@@ -86,3 +86,9 @@ def test_di_kotak_indonesia_koordinat_kosong():
     assert not wilayah.di_kotak_indonesia(None, None)
     assert not wilayah.di_kotak_indonesia(float("nan"), 106.8)
     assert wilayah.di_kotak_indonesia("-6.1", "106.8")
+
+
+def test_koordinat_tak_hingga_tidak_masuk_wilayah():
+    assert wilayah.tentukan_wilayah(float("inf"), 106.8) == ""
+    assert wilayah.tentukan_wilayah(-6.1, float("-inf")) == ""
+    assert wilayah.tentukan_wilayah(float("inf"), float("inf")) == ""

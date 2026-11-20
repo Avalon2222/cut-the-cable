@@ -56,8 +56,8 @@ def tentukan_wilayah(lat: float, lon: float) -> str:
         lat, lon = float(lat), float(lon)
     except (TypeError, ValueError):
         return ""
-    if math.isnan(lat) or math.isnan(lon):
-        return ""
+    if not (math.isfinite(lat) and math.isfinite(lon)):
+        return ""   # NaN dan tak hingga sama-sama bukan koordinat; inf jangan sampai jatuh ke Papua
     # 1. Papua: semua yang di timur 135° BT, plus kepala burung (Sorong, Fakfak, Kaimana, Timika)
     if lon >= 135.0 or (lon >= 130.3 and lat >= -4.7):
         return "Papua"
