@@ -71,3 +71,13 @@ def test_muat_semua_status_dan_kategori_dirapikan(tmp_path):
     d = muat_data.muat_semua(tmp_path)
     assert list(d.kabel["status"]) == list(asli.kabel["status"])
     assert list(d.kabel["kategori"]) == list(asli.kabel["kategori"])
+
+
+def test_negara_landing_dirapikan(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    landing = pd.read_csv(folder / "landing_station.csv")
+    landing["negara"] = landing["negara"].where(landing["negara"] != "Indonesia", " Indonesia ")
+    landing.to_csv(folder / "landing_station.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert (d.landing["negara"] == "Indonesia").sum() == (landing["negara"] == " Indonesia ").sum() > 0

@@ -79,6 +79,9 @@ def muat_semua(folder: Path = DATA) -> Data:
     kabel["pemilik"] = kabel["pemilik"].fillna("")
     kabel["pemasok"] = kabel["pemasok"].fillna("")
     landing["wilayah"] = landing["wilayah"].fillna("")
+    # Graf membandingkan negara == "Indonesia" persis; "Indonesia " dari suntingan manual
+    # membuat landing dalam negeri terhitung sebagai luar negeri.
+    landing["negara"] = landing["negara"].where(landing["negara"].isna(), landing["negara"].astype(str).str.strip())
     return Data(kabel=kabel, landing=landing, relasi=relasi, geo=geo, meta=meta)
 
 
