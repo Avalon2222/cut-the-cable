@@ -285,3 +285,11 @@ def test_ringkas_wilayah_label_wilayah_kosong(data):
     tabel = jaringan.ringkas_wilayah(jaringan.simulasi(data, set()))
     assert "" not in tabel.index
     assert tabel.loc["Tidak diketahui", "Total"] == 2
+
+
+def test_simulasi_kabel_tanpa_nama_tidak_error():
+    d = buat_data_mainan()
+    d.kabel.loc[d.kabel["id"] == "int-1", "nama"] = None
+    hasil = jaringan.simulasi(d, {"int-1", "dom-1"})
+    btm = hasil.set_index("id").loc["btm"]
+    assert btm["kabel_hilang"] == "Batam-Jakarta; int-1"
