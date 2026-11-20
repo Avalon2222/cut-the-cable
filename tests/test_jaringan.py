@@ -293,3 +293,10 @@ def test_simulasi_kabel_tanpa_nama_tidak_error():
     hasil = jaringan.simulasi(d, {"int-1", "dom-1"})
     btm = hasil.set_index("id").loc["btm"]
     assert btm["kabel_hilang"] == "Batam-Jakarta; int-1"
+
+
+def test_gateway_kabel_tanpa_nama_pakai_id():
+    d = buat_data_mainan()
+    d.kabel.loc[d.kabel["id"] == "int-1", "nama"] = None
+    tabel = jaringan.gateway_luar_negeri(d).set_index("negara")
+    assert tabel.loc["Singapore", "kabel"] == "Jakarta-Singapore; int-1"

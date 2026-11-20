@@ -258,10 +258,10 @@ def gateway_luar_negeri(data: Data, sertakan_rencana: bool = False) -> pd.DataFr
     rel = data.relasi[data.relasi["id_kabel"].isin(kabel["id"])].copy()
     rel["negara"] = rel["id_landing"].map(negara_landing)
     rel = rel[rel["negara"] != "Indonesia"].drop_duplicates(["id_kabel", "negara"])
-    nama = kabel.set_index("id")["nama"]
+    nama = _peta_nama_kabel(kabel)
     tabel = (
         rel.groupby("negara")["id_kabel"]
-        .agg(n_kabel="nunique", kabel=lambda s: "; ".join(sorted(nama[s])))
+        .agg(n_kabel="nunique", kabel=lambda s: "; ".join(sorted(nama.get(k, k) for k in s)))
         .reset_index()
         .sort_values("n_kabel", ascending=False)
     )
