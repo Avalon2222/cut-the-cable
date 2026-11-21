@@ -2,6 +2,7 @@
 
 import json
 
+import networkx as nx
 import pandas as pd
 import pytest
 
@@ -300,3 +301,13 @@ def test_gateway_kabel_tanpa_nama_pakai_id():
     d.kabel.loc[d.kabel["id"] == "int-1", "nama"] = None
     tabel = jaringan.gateway_luar_negeri(d).set_index("negara")
     assert tabel.loc["Singapore", "kabel"] == "Jakarta-Singapore; int-1"
+
+
+def test_pasangan_darat_landing_dobel_tanpa_sisi_ke_diri_sendiri():
+    d = buat_data_mainan()
+    dobel = pd.concat([d.landing, d.landing[d.landing["id"] == "jkt"]], ignore_index=True)
+    pasangan = jaringan.pasangan_darat(dobel, 60)
+    assert all(a != b for a, b in pasangan)
+    d.landing = dobel
+    G = jaringan.bangun_graf(d)
+    assert nx.number_of_selfloops(G) == 0
