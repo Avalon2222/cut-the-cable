@@ -4,7 +4,7 @@ import shutil
 
 import pandas as pd
 
-from src import muat_data
+from src import jaringan, muat_data
 from tests.test_jaringan import buat_data_mainan
 
 
@@ -81,3 +81,16 @@ def test_negara_landing_dirapikan(tmp_path):
     landing.to_csv(folder / "landing_station.csv", index=False)
     d = muat_data.muat_semua(folder)
     assert (d.landing["negara"] == "Indonesia").sum() == (landing["negara"] == " Indonesia ").sum() > 0
+
+
+def test_koordinat_landing_teks_rusak_jadi_nan(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    landing = pd.read_csv(folder / "landing_station.csv")
+    landing["lat"] = landing["lat"].astype(object)
+    landing.loc[0, "lat"] = "tidak ada"
+    landing.to_csv(folder / "landing_station.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert pd.api.types.is_float_dtype(d.landing["lat"])
+    assert pd.isna(d.landing.loc[0, "lat"])
+    jaringan.bangun_graf(d)
