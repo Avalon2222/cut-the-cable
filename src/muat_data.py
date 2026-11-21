@@ -79,6 +79,10 @@ def muat_semua(folder: Path = DATA) -> Data:
     kabel["pemilik"] = kabel["pemilik"].fillna("")
     kabel["pemasok"] = kabel["pemasok"].fillna("")
     landing["wilayah"] = landing["wilayah"].fillna("")
+    # Koordinat teks rusak (mis. "tidak ada") jadi NaN; kalau dibiarkan teks, kolomnya bukan angka
+    # dan perhitungan jarak antar landing station gagal untuk seluruh graf.
+    for kolom in ("lat", "lon"):
+        landing[kolom] = pd.to_numeric(landing[kolom], errors="coerce")
     # Graf membandingkan negara == "Indonesia" persis; "Indonesia " dari suntingan manual
     # membuat landing dalam negeri terhitung sebagai luar negeri.
     landing["negara"] = landing["negara"].where(landing["negara"].isna(), landing["negara"].astype(str).str.strip())
