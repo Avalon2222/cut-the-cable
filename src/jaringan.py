@@ -89,7 +89,8 @@ def pasangan_darat(landing: pd.DataFrame, radius_km: float) -> list[tuple[str, s
     if radius_km <= 0:
         return []
     hasil = []
-    titik = landing.dropna(subset=["lat", "lon"])
+    # Landing yang tercatat dua kali tidak boleh dipasangkan dengan dirinya sendiri (sisi ke diri sendiri).
+    titik = landing.dropna(subset=["lat", "lon"]).drop_duplicates("id")
     for _, grup in titik.groupby("negara"):
         baris = list(grup[["id", "lat", "lon"]].itertuples(index=False))
         for (a, la1, lo1), (b, la2, lo2) in combinations(baris, 2):
