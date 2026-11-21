@@ -44,13 +44,20 @@ class Data:
         # Kabel yang mencatat landing ini dua kali tetap dihitung satu kabel.
         return list(dict.fromkeys(ids))
 
+    @staticmethod
+    def _peta_nama(tabel: pd.DataFrame) -> dict[str, str]:
+        # Nama kosong tidak dimasukkan, supaya pencarian jatuh ke id dan bukan mengembalikan NaN.
+        nama = tabel.set_index("id")["nama"]
+        nama = nama[nama.notna() & (nama.astype(str).str.strip() != "")]
+        return nama.astype(str).to_dict()
+
     @cached_property
     def _nama_kabel(self) -> dict[str, str]:
-        return self.kabel.set_index("id")["nama"].to_dict()
+        return self._peta_nama(self.kabel)
 
     @cached_property
     def _nama_landing(self) -> dict[str, str]:
-        return self.landing.set_index("id")["nama"].to_dict()
+        return self._peta_nama(self.landing)
 
     def nama_kabel(self, id_kabel: str) -> str:
         """Nama kabel, atau id-nya sendiri bila tidak ditemukan. Tabel id -> nama dibuat sekali saja."""

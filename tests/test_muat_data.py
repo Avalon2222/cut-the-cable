@@ -94,3 +94,13 @@ def test_koordinat_landing_teks_rusak_jadi_nan(tmp_path):
     assert pd.api.types.is_float_dtype(d.landing["lat"])
     assert pd.isna(d.landing.loc[0, "lat"])
     jaringan.bangun_graf(d)
+
+
+def test_nama_kosong_jatuh_ke_id():
+    d = buat_data_mainan()
+    d.kabel["nama"] = d.kabel["nama"].astype(object)
+    d.kabel.loc[0, "nama"] = None
+    d.landing.loc[0, "nama"] = "  "
+    assert d.nama_kabel(d.kabel["id"].iloc[0]) == d.kabel["id"].iloc[0]
+    assert d.nama_landing(d.landing["id"].iloc[0]) == d.landing["id"].iloc[0]
+    assert d.nama_kabel(d.kabel["id"].iloc[1]) == d.kabel["nama"].iloc[1]
