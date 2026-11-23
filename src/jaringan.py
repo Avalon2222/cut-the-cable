@@ -264,7 +264,9 @@ def gateway_luar_negeri(data: Data, sertakan_rencana: bool = False) -> pd.DataFr
         rel.groupby("negara")["id_kabel"]
         .agg(n_kabel="nunique", kabel=lambda s: "; ".join(sorted(nama.get(k, k) for k in s)))
         .reset_index()
-        .sort_values("n_kabel", ascending=False)
+        # Negara dengan jumlah kabel sama diurutkan abjad supaya tabel & grafik tidak acak.
+        .sort_values(["n_kabel", "negara"], ascending=[False, True], kind="mergesort")
+        .reset_index(drop=True)
     )
     tabel["persen"] = (100 * tabel["n_kabel"] / len(kabel)).round(0).astype(int)
     return tabel

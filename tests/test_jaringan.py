@@ -311,3 +311,20 @@ def test_pasangan_darat_landing_dobel_tanpa_sisi_ke_diri_sendiri():
     d.landing = dobel
     G = jaringan.bangun_graf(d)
     assert nx.number_of_selfloops(G) == 0
+
+
+def test_gateway_luar_negeri_jumlah_seri_urut_abjad():
+    kabel = pd.DataFrame({"id": [f"k{i:02d}" for i in range(60)], "nama": [f"K{i:02d}" for i in range(60)],
+                          "kategori": "internasional", "status": "aktif"})
+    landing = pd.DataFrame({"id": ["idn"] + [f"L{i:02d}" for i in range(60)], "nama": "x", "kota": "x",
+                            "negara": ["Indonesia"] + [f"N{i:02d}" for i in range(60)],
+                            "lat": 0.0, "lon": 0.0, "wilayah": ""})
+    relasi = [{"id_kabel": f"k{i:02d}", "id_landing": "idn", "urutan": 0} for i in range(60)]
+    for i in range(60):
+        for k in range(i % 3 + 1):
+            relasi.append({"id_kabel": f"k{(i + k) % 60:02d}", "id_landing": f"L{i:02d}", "urutan": 1})
+    data = Data(kabel=kabel, landing=landing, relasi=pd.DataFrame(relasi), geo={"features": []}, meta={})
+    tabel = jaringan.gateway_luar_negeri(data)
+    tiga = tabel[tabel["n_kabel"] == 3]["negara"].tolist()
+    assert tiga == sorted(tiga)
+    assert list(tabel.index) == list(range(len(tabel)))
