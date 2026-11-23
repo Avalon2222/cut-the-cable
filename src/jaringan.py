@@ -75,6 +75,13 @@ def kabel_aktif(data: Data, sertakan_rencana: bool = False) -> pd.DataFrame:
 RADIUS_DARAT_KM = 60.0
 
 
+def _himpunan_id(putus: Iterable[str]) -> set[str]:
+    """Satu id kabel yang dikirim sebagai string jangan sampai dipecah jadi huruf-hurufnya oleh set()."""
+    if isinstance(putus, str):
+        return {putus}
+    return set(putus)
+
+
 def jarak_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Jarak lingkaran besar (haversine) dalam km; cukup akurat untuk puluhan-ratusan km."""
     r = 6371.0
@@ -103,7 +110,7 @@ def bangun_graf(data: Data, putus: Iterable[str] = (), sertakan_rencana: bool = 
                 radius_darat_km: float = RADIUS_DARAT_KM) -> nx.Graph:
     """Bangun graf landing station dari semua kabel yang dihitung, minus kabel yang diputus,
     ditambah sisi "darat" antar landing station yang berdekatan."""
-    putus = set(putus)
+    putus = _himpunan_id(putus)
     kabel = kabel_aktif(data, sertakan_rencana)
     negara = data.landing.set_index("id")["negara"].to_dict()
     G = nx.Graph()
@@ -177,7 +184,7 @@ def simulasi(data: Data, putus: Iterable[str], sertakan_rencana: bool = False,
       pintu_awal, pintu_sisa (jumlah kabel internasional yang terjangkau),
       status (salah satu dari STATUS).
     """
-    putus = set(putus)
+    putus = _himpunan_id(putus)
     kabel = kabel_aktif(data, sertakan_rencana)
     kabel_int = set(kabel.loc[kabel["kategori"] == "internasional", "id"])
     nama_kabel = _peta_nama_kabel(kabel)

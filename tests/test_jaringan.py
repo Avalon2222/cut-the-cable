@@ -328,3 +328,10 @@ def test_gateway_luar_negeri_jumlah_seri_urut_abjad():
     tiga = tabel[tabel["n_kabel"] == 3]["negara"].tolist()
     assert tiga == sorted(tiga)
     assert list(tabel.index) == list(range(len(tabel)))
+
+
+def test_putus_satu_id_sebagai_string(data):
+    satu = jaringan.simulasi(data, "int-1").set_index("id")
+    daftar = jaringan.simulasi(data, ["int-1"]).set_index("id")
+    assert satu.loc["btm", "n_kabel_sisa"] == daftar.loc["btm", "n_kabel_sisa"] == 1
+    assert not jaringan.bangun_graf(data, "int-1").has_edge("btm", "sg")
