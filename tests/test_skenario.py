@@ -1,5 +1,6 @@
 """Uji pemilihan kabel per skenario dan uji geometri garis vs kotak."""
 
+import numpy as np
 import pytest
 
 from src import skenario
@@ -189,3 +190,11 @@ def test_ruas_lintas_antimeridian_tidak_membentang_ke_seluruh_dunia():
     assert skenario.garis_lewat_kotak(ruas, skenario.Kotak("Barat 180", 179.8, 180, 19, 22))
     assert skenario.garis_lewat_kotak(ruas, skenario.Kotak("Timur 180", -180, -179.8, 19, 22))
     assert skenario.garis_lewat_kotak([[[-179.5, 21.0], [179.5, 20.0]]], skenario.Kotak("Balik", 179.8, 180, 19, 22))
+
+
+def test_garis_lewat_kotak_koordinat_numpy_dan_bool():
+    kotak = Kotak("uji", 105.0, 106.0, -6.0, -5.0)
+    garis_numpy = [[np.float32(104.0), np.int64(-6)], [np.float32(107.0), np.int64(-5)]]
+    assert skenario.garis_lewat_kotak([garis_numpy], kotak)
+    # True/False bukan koordinat; ruas palsu (1, 1) -> (106, -5) tidak boleh terbentuk.
+    assert not skenario.garis_lewat_kotak([[[True, True], [107.0, -5.6]]], kotak)

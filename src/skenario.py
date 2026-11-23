@@ -16,6 +16,7 @@ mengecek titik sudut garis, supaya kotak kecil yang dilintasi segmen panjang tet
 from __future__ import annotations
 
 import math
+import numbers
 from dataclasses import dataclass
 from itertools import pairwise
 
@@ -147,6 +148,11 @@ def _daftar_garis(geometri: dict | None) -> list:
     return []
 
 
+def _angka_sah(v) -> bool:
+    """Koordinat yang sah: bilangan real terhingga, termasuk numpy.int64/float32, tetapi bukan bool."""
+    return isinstance(v, numbers.Real) and not isinstance(v, bool) and math.isfinite(v)
+
+
 def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
     """True bila ada satu ruas saja dari MultiLineString yang memotong kotak.
 
@@ -156,7 +162,7 @@ def garis_lewat_kotak(koordinat_multiline, kotak: Kotak) -> bool:
         # Titik rusak (None, kurang dari dua angka, NaN) dibuang supaya tidak membuat ruas palsu.
         garis = [tuple(titik[:2]) for titik in garis or []
                  if titik is not None and len(titik) >= 2
-                 and all(isinstance(v, (int, float)) and math.isfinite(v) for v in titik[:2])]
+                 and all(_angka_sah(v) for v in titik[:2])]
         for a, b in pairwise(garis):
             if any(segmen_memotong_kotak(r1, r2, kotak) for r1, r2 in _ruas_tanpa_lompat_antimeridian(a, b)):
                 return True
