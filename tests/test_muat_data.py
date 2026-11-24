@@ -115,3 +115,17 @@ def test_data_center_koordinat_rusak_dibuang(tmp_path):
     hasil = muat_data.muat_data_center(tmp_path)
     assert len(hasil) == len(dc) - 2
     assert pd.api.types.is_float_dtype(hasil["lat"]) and pd.api.types.is_float_dtype(hasil["lon"])
+
+
+def test_urutan_landing_dibaca_sebagai_angka(tmp_path):
+    for nama in ("kabel.csv", "landing_station.csv", "kabel_geo.json", "META.json"):
+        shutil.copy(muat_data.DATA / nama, tmp_path / nama)
+    relasi = pd.read_csv(muat_data.DATA / "kabel_landing.csv")
+    kabel_uji = relasi["id_kabel"].value_counts().index[0]
+    rel = relasi[relasi["id_kabel"] == kabel_uji].copy()
+    assert len(rel) >= 3
+    rel["urutan"] = [str(i * 10) if i else "2" for i in range(len(rel))]   # "2", "10", "20", ...
+    rel.iloc[-1, rel.columns.get_loc("urutan")] = "x"
+    pd.concat([relasi[relasi["id_kabel"] != kabel_uji], rel]).to_csv(tmp_path / "kabel_landing.csv", index=False)
+    d = muat_data.muat_semua(tmp_path)
+    assert d.landing_dari_kabel(kabel_uji)[:2] == rel["id_landing"].tolist()[:2]
