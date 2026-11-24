@@ -100,4 +100,10 @@ def muat_data_center(folder: Path = DATA) -> pd.DataFrame:
     """Lokasi data center besar di Indonesia (dari proyek dc-impact-dashboard), untuk lapisan peta opsional."""
     df = pd.read_csv(folder / "data_center.csv")
     kolom = ["nama", "operator", "kabupaten_kota", "provinsi", "lat", "lon", "kapasitas_it_mw", "status"]
-    return df[kolom].dropna(subset=["lat", "lon"])
+    df = df[kolom].copy()
+    # Sama seperti landing station: koordinat teks rusak atau tak hingga jadi NaN lalu dibuang,
+    # supaya satu sel salah tidak membuat lapisan peta data center gagal digambar.
+    for k in ("lat", "lon", "kapasitas_it_mw"):
+        df[k] = pd.to_numeric(df[k], errors="coerce")
+    df[["lat", "lon"]] = df[["lat", "lon"]].where(df[["lat", "lon"]].abs() != float("inf"))
+    return df.dropna(subset=["lat", "lon"])
