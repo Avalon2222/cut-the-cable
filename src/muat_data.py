@@ -77,6 +77,8 @@ def muat_semua(folder: Path = DATA) -> Data:
         meta = json.load(fh)
 
     kabel["tahun_rfs"] = pd.to_numeric(kabel["tahun_rfs"], errors="coerce").astype("Int64")
+    # Urutan pendaratan harus angka; satu sel teks membuat kolomnya teks dan "10" tersortir sebelum "2".
+    relasi["urutan"] = pd.to_numeric(relasi["urutan"], errors="coerce")
     kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
     # Status dan kategori dibandingkan persis ("aktif", "internasional"); suntingan manual seperti
     # "Aktif " atau "INTERNASIONAL" jangan sampai membuat kabel keluar dari graf diam-diam.
