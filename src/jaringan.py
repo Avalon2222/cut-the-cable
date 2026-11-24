@@ -133,11 +133,17 @@ def bangun_graf(data: Data, putus: Iterable[str] = (), sertakan_rencana: bool = 
     return G
 
 
+def _luar_negeri(negara) -> bool:
+    return isinstance(negara, str) and negara.strip() not in ("", "Indonesia")
+
+
 def _komponen_internasional(G: nx.Graph) -> dict[str, bool]:
     """Untuk setiap simpul: apakah komponen terhubungnya memuat simpul luar negeri?"""
     hasil = {}
     for komp in nx.connected_components(G):
-        ada_asing = any(G.nodes[n]["negara"] != "Indonesia" for n in komp)
+        # Negara kosong (NaN) bukan berarti luar negeri; dulu NaN != "Indonesia" membuat pulau
+        # yang terisolasi terlihat masih punya jalur ke dunia.
+        ada_asing = any(_luar_negeri(G.nodes[n]["negara"]) for n in komp)
         for n in komp:
             hasil[n] = ada_asing
     return hasil
