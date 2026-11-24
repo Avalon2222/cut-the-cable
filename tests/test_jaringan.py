@@ -335,3 +335,11 @@ def test_putus_satu_id_sebagai_string(data):
     daftar = jaringan.simulasi(data, ["int-1"]).set_index("id")
     assert satu.loc["btm", "n_kabel_sisa"] == daftar.loc["btm", "n_kabel_sisa"] == 1
     assert not jaringan.bangun_graf(data, "int-1").has_edge("btm", "sg")
+
+
+def test_landing_tanpa_negara_bukan_jalur_luar_negeri():
+    d = buat_data_mainan()
+    # Mentawai kehilangan data negaranya: Padang tetap tidak punya jalur ke luar negeri.
+    d.landing.loc[d.landing["id"] == "mtw", "negara"] = None
+    hasil = jaringan.simulasi(d, []).set_index("id")
+    assert not hasil.loc["pdg", "internasional_awal"]
