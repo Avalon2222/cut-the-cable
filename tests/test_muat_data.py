@@ -104,3 +104,14 @@ def test_nama_kosong_jatuh_ke_id():
     assert d.nama_kabel(d.kabel["id"].iloc[0]) == d.kabel["id"].iloc[0]
     assert d.nama_landing(d.landing["id"].iloc[0]) == d.landing["id"].iloc[0]
     assert d.nama_kabel(d.kabel["id"].iloc[1]) == d.kabel["nama"].iloc[1]
+
+
+def test_data_center_koordinat_rusak_dibuang(tmp_path):
+    dc = pd.read_csv(muat_data.DATA / "data_center.csv")
+    dc["lat"] = dc["lat"].astype(object)
+    dc.loc[0, "lat"] = "tidak ada"
+    dc.loc[1, "lon"] = float("inf")
+    dc.to_csv(tmp_path / "data_center.csv", index=False)
+    hasil = muat_data.muat_data_center(tmp_path)
+    assert len(hasil) == len(dc) - 2
+    assert pd.api.types.is_float_dtype(hasil["lat"]) and pd.api.types.is_float_dtype(hasil["lon"])
