@@ -271,7 +271,8 @@ def gateway_luar_negeri(data: Data, sertakan_rencana: bool = False) -> pd.DataFr
     negara_landing = data.landing.set_index("id")["negara"].to_dict()
     rel = data.relasi[data.relasi["id_kabel"].isin(kabel["id"])].copy()
     rel["negara"] = rel["id_landing"].map(negara_landing)
-    rel = rel[rel["negara"] != "Indonesia"].drop_duplicates(["id_kabel", "negara"])
+    # Negara kosong bukan gerbang luar negeri; dulu "" muncul sebagai baris tanpa nama di tabel gateway.
+    rel = rel[rel["negara"].map(_luar_negeri)].drop_duplicates(["id_kabel", "negara"])
     nama = _peta_nama_kabel(kabel)
     tabel = (
         rel.groupby("negara")["id_kabel"]
