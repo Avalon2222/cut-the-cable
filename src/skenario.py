@@ -34,6 +34,14 @@ class Kotak:
     keterangan: str = ""
 
     def __post_init__(self) -> None:
+        # Batas dari CSV atau form bisa berupa teks angka ("95.0"); ubah dulu ke float, dan teks yang
+        # bukan angka dilaporkan sebagai ValueError yang menyebut nama kotaknya, bukan TypeError mentah.
+        for kolom in ("lon_min", "lon_max", "lat_min", "lat_max"):
+            nilai = getattr(self, kolom)
+            try:
+                object.__setattr__(self, kolom, float(nilai))
+            except (TypeError, ValueError):
+                raise ValueError(f"Kotak '{self.nama}': {kolom} bukan angka: {nilai!r}") from None
         batas = (self.lon_min, self.lon_max, self.lat_min, self.lat_max)
         if not all(math.isfinite(b) for b in batas):
             # NaN lolos dari perbandingan di bawah dan membuat kotak diam-diam tidak memuat apa pun.

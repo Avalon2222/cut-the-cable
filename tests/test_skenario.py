@@ -198,3 +198,13 @@ def test_garis_lewat_kotak_koordinat_numpy_dan_bool():
     assert skenario.garis_lewat_kotak([garis_numpy], kotak)
     # True/False bukan koordinat; ruas palsu (1, 1) -> (106, -5) tidak boleh terbentuk.
     assert not skenario.garis_lewat_kotak([[[True, True], [107.0, -5.6]]], kotak)
+
+
+def test_kotak_batas_teks_angka_diubah_ke_float():
+    k = Kotak("uji", "95", "141.5", "-11", " 6 ")
+    assert (k.lon_min, k.lon_max, k.lat_min, k.lat_max) == (95.0, 141.5, -11.0, 6.0)
+    assert k.memuat(106.8, -6.2)
+    with pytest.raises(ValueError, match="lat_max"):
+        Kotak("uji", 95, 141, -11, "utara")
+    with pytest.raises(ValueError, match="lon_min"):
+        Kotak("uji", None, 141, -11, 6)
