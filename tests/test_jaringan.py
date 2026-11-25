@@ -343,3 +343,12 @@ def test_landing_tanpa_negara_bukan_jalur_luar_negeri():
     d.landing.loc[d.landing["id"] == "mtw", "negara"] = None
     hasil = jaringan.simulasi(d, []).set_index("id")
     assert not hasil.loc["pdg", "internasional_awal"]
+
+
+def test_gateway_abaikan_negara_kosong():
+    d = buat_data_mainan()
+    d.landing.loc[d.landing["id"] == "sg", "negara"] = "  "
+    d.landing.loc[d.landing["id"] == "gum", "negara"] = None
+    tabel = jaringan.gateway_luar_negeri(d, sertakan_rencana=True)
+    assert tabel.empty
+    assert list(tabel.columns) == ["negara", "n_kabel", "kabel", "persen"]
