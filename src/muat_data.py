@@ -92,6 +92,8 @@ def muat_semua(folder: Path = DATA) -> Data:
     # dan perhitungan jarak antar landing station gagal untuk seluruh graf.
     for kolom in ("lat", "lon"):
         landing[kolom] = pd.to_numeric(landing[kolom], errors="coerce")
+        # "inf" terbaca sebagai angka tak hingga dan membuat haversine (math.sin) error saat graf dibangun.
+        landing[kolom] = landing[kolom].where(landing[kolom].abs() != float("inf"))
     # Graf membandingkan negara == "Indonesia" persis; "Indonesia " dari suntingan manual
     # membuat landing dalam negeri terhitung sebagai luar negeri.
     landing["negara"] = landing["negara"].where(landing["negara"].isna(), landing["negara"].astype(str).str.strip())

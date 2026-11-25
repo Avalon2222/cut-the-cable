@@ -129,3 +129,15 @@ def test_urutan_landing_dibaca_sebagai_angka(tmp_path):
     pd.concat([relasi[relasi["id_kabel"] != kabel_uji], rel]).to_csv(tmp_path / "kabel_landing.csv", index=False)
     d = muat_data.muat_semua(tmp_path)
     assert d.landing_dari_kabel(kabel_uji)[:2] == rel["id_landing"].tolist()[:2]
+
+
+def test_koordinat_landing_tak_hingga_jadi_nan(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    landing = pd.read_csv(folder / "landing_station.csv")
+    landing["lon"] = landing["lon"].astype(object)
+    landing.loc[0, "lon"] = "inf"
+    landing.to_csv(folder / "landing_station.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert pd.isna(d.landing.loc[0, "lon"])
+    jaringan.bangun_graf(d)
