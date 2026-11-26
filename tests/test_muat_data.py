@@ -141,3 +141,18 @@ def test_koordinat_landing_tak_hingga_jadi_nan(tmp_path):
     d = muat_data.muat_semua(folder)
     assert pd.isna(d.landing.loc[0, "lon"])
     jaringan.bangun_graf(d)
+
+
+def test_tahun_rfs_pecahan_atau_tak_hingga_jadi_kosong(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    kabel = pd.read_csv(folder / "kabel.csv")
+    kabel["tahun_rfs"] = kabel["tahun_rfs"].astype(object)
+    kabel.loc[0, "tahun_rfs"] = "2020.5"
+    kabel.loc[1, "tahun_rfs"] = "inf"
+    kabel.loc[2, "tahun_rfs"] = "2021.0"
+    kabel.to_csv(folder / "kabel.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert str(d.kabel["tahun_rfs"].dtype) == "Int64"
+    assert pd.isna(d.kabel.loc[0, "tahun_rfs"]) and pd.isna(d.kabel.loc[1, "tahun_rfs"])
+    assert d.kabel.loc[2, "tahun_rfs"] == 2021
