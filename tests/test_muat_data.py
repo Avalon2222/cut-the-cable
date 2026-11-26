@@ -169,3 +169,16 @@ def test_id_berspasi_tetap_tersambung(tmp_path):
     relasi.to_csv(folder / "kabel_landing.csv", index=False)
     d = muat_data.muat_semua(folder)
     assert d.landing_dari_kabel(kabel_uji) == asli.landing_dari_kabel(kabel_uji) != []
+
+
+def test_koordinat_landing_di_luar_jangkauan_jadi_nan(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    landing = pd.read_csv(folder / "landing_station.csv")
+    landing.loc[0, "lat"] = 106.8     # lat dan lon tertukar
+    landing.loc[1, "lon"] = -190.0
+    landing.to_csv(folder / "landing_station.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert pd.isna(d.landing.loc[0, "lat"]) and pd.isna(d.landing.loc[1, "lon"])
+    assert d.landing.loc[2, ["lat", "lon"]].notna().all()
+    jaringan.bangun_graf(d)
