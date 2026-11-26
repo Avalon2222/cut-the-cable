@@ -156,3 +156,16 @@ def test_tahun_rfs_pecahan_atau_tak_hingga_jadi_kosong(tmp_path):
     assert str(d.kabel["tahun_rfs"].dtype) == "Int64"
     assert pd.isna(d.kabel.loc[0, "tahun_rfs"]) and pd.isna(d.kabel.loc[1, "tahun_rfs"])
     assert d.kabel.loc[2, "tahun_rfs"] == 2021
+
+
+def test_id_berspasi_tetap_tersambung(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    asli = muat_data.muat_semua()
+    relasi = pd.read_csv(folder / "kabel_landing.csv")
+    kabel_uji = relasi["id_kabel"].iloc[0]
+    relasi["id_kabel"] = relasi["id_kabel"].where(relasi["id_kabel"] != kabel_uji, f" {kabel_uji} ")
+    relasi["id_landing"] = relasi["id_landing"] + " "
+    relasi.to_csv(folder / "kabel_landing.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert d.landing_dari_kabel(kabel_uji) == asli.landing_dari_kabel(kabel_uji) != []

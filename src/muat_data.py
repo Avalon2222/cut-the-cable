@@ -81,6 +81,11 @@ def muat_semua(folder: Path = DATA) -> Data:
     # dimuat; tahun seperti itu dianggap tidak diketahui.
     tahun = pd.to_numeric(kabel["tahun_rfs"], errors="coerce")
     kabel["tahun_rfs"] = tahun.where(np.isfinite(tahun) & (tahun % 1 == 0)).astype("Int64")
+    # Id dari suntingan manual ("sjc-2 ") harus persis sama di ketiga tabel; spasi sisa membuat
+    # relasi tidak menemukan kabel atau landing-nya dan kabel itu hilang dari graf diam-diam.
+    for tabel, kolom_id in ((kabel, ["id"]), (landing, ["id"]), (relasi, ["id_kabel", "id_landing"])):
+        for kolom in kolom_id:
+            tabel[kolom] = tabel[kolom].map(lambda v: v.strip() if isinstance(v, str) else v)
     # Urutan pendaratan harus angka; satu sel teks membuat kolomnya teks dan "10" tersortir sebelum "2".
     relasi["urutan"] = pd.to_numeric(relasi["urutan"], errors="coerce")
     kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
