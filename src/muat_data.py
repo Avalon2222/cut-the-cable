@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 DATA = Path(__file__).resolve().parents[1] / "data"
@@ -76,7 +77,10 @@ def muat_semua(folder: Path = DATA) -> Data:
     with open(folder / "META.json", encoding="utf-8") as fh:
         meta = json.load(fh)
 
-    kabel["tahun_rfs"] = pd.to_numeric(kabel["tahun_rfs"], errors="coerce").astype("Int64")
+    # Tahun pecahan ("2020.5") atau "inf" membuat astype("Int64") error dan seluruh aplikasi gagal
+    # dimuat; tahun seperti itu dianggap tidak diketahui.
+    tahun = pd.to_numeric(kabel["tahun_rfs"], errors="coerce")
+    kabel["tahun_rfs"] = tahun.where(np.isfinite(tahun) & (tahun % 1 == 0)).astype("Int64")
     # Urutan pendaratan harus angka; satu sel teks membuat kolomnya teks dan "10" tersortir sebelum "2".
     relasi["urutan"] = pd.to_numeric(relasi["urutan"], errors="coerce")
     kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
