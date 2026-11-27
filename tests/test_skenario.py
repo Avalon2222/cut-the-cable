@@ -208,3 +208,13 @@ def test_kotak_batas_teks_angka_diubah_ke_float():
         Kotak("uji", 95, 141, -11, "utara")
     with pytest.raises(ValueError, match="lon_min"):
         Kotak("uji", None, 141, -11, 6)
+
+
+def test_kabel_lewat_kotak_id_geojson_berspasi(data):
+    garis = {"type": "LineString", "coordinates": [[104.0, 1.1], [103.8, 1.3]]}
+    data.geo["features"] = [
+        {"type": "Feature", "properties": {"id": " int-1 "}, "geometry": garis},
+        {"type": "Feature", "properties": {"id": "  "}, "geometry": garis},
+    ]
+    batam = Kotak("Batam", 103.5, 104.5, 0.9, 1.5)
+    assert skenario.kabel_lewat_kotak(data, batam) == {"int-1"}
