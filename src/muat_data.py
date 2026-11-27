@@ -86,6 +86,10 @@ def muat_semua(folder: Path = DATA) -> Data:
     for tabel, kolom_id in ((kabel, ["id"]), (landing, ["id"]), (relasi, ["id_kabel", "id_landing"])):
         for kolom in kolom_id:
             tabel[kolom] = tabel[kolom].map(lambda v: v.strip() if isinstance(v, str) else v)
+    # Id yang tercatat dua kali (baris tersalin saat menyunting CSV) membuat landing tampil dobel di
+    # tabel simulasi dan persen gateway dihitung dari jumlah kabel yang kelebihan; pakai baris pertama.
+    kabel = kabel.drop_duplicates("id", keep="first").reset_index(drop=True)
+    landing = landing.drop_duplicates("id", keep="first").reset_index(drop=True)
     # Urutan pendaratan harus angka; satu sel teks membuat kolomnya teks dan "10" tersortir sebelum "2".
     relasi["urutan"] = pd.to_numeric(relasi["urutan"], errors="coerce")
     kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
