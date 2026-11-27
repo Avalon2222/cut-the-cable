@@ -182,3 +182,16 @@ def test_koordinat_landing_di_luar_jangkauan_jadi_nan(tmp_path):
     assert pd.isna(d.landing.loc[0, "lat"]) and pd.isna(d.landing.loc[1, "lon"])
     assert d.landing.loc[2, ["lat", "lon"]].notna().all()
     jaringan.bangun_graf(d)
+
+
+def test_id_kabel_dan_landing_dobel_dipakai_sekali(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    asli = muat_data.muat_semua()
+    for nama in ("kabel.csv", "landing_station.csv"):
+        tabel = pd.read_csv(folder / nama)
+        pd.concat([tabel, tabel.head(3)]).to_csv(folder / nama, index=False)
+    d = muat_data.muat_semua(folder)
+    assert len(d.kabel) == len(asli.kabel) and d.kabel["id"].is_unique
+    assert len(d.landing) == len(asli.landing) and d.landing["id"].is_unique
+    assert jaringan.simulasi(d, [])["id"].is_unique
