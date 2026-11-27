@@ -187,7 +187,9 @@ def kabel_lewat_kotak(data: Data, kotak: Kotak, hanya_aktif: bool = True, sertak
     hasil = set()
     for f in data.geo["features"]:
         cid = (f.get("properties") or {}).get("id")
-        if cid is None:
+        # Id berspasi ("int-1 ") dirapikan seperti id di tabel kabel; kalau tidak, statusnya tidak ditemukan.
+        cid = cid.strip() if isinstance(cid, str) else cid
+        if cid is None or cid == "":
             continue   # fitur GeoJSON tanpa id tidak bisa dicocokkan ke tabel kabel
         if hanya_aktif and status.get(cid) != "aktif":
             continue
