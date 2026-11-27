@@ -352,3 +352,10 @@ def test_gateway_abaikan_negara_kosong():
     tabel = jaringan.gateway_luar_negeri(d, sertakan_rencana=True)
     assert tabel.empty
     assert list(tabel.columns) == ["negara", "n_kabel", "kabel", "persen"]
+
+
+def test_putus_id_berspasi_dan_kosong(data):
+    biasa = jaringan.simulasi(data, ["int-1"]).set_index("id")
+    berspasi = jaringan.simulasi(data, [" int-1 ", "", None]).set_index("id")
+    assert berspasi.loc["btm", "n_kabel_sisa"] == biasa.loc["btm", "n_kabel_sisa"] == 1
+    assert not jaringan.bangun_graf(data, " int-1").has_edge("btm", "sg")
