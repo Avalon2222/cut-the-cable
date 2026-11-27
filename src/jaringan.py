@@ -78,8 +78,9 @@ RADIUS_DARAT_KM = 60.0
 def _himpunan_id(putus: Iterable[str]) -> set[str]:
     """Satu id kabel yang dikirim sebagai string jangan sampai dipecah jadi huruf-hurufnya oleh set()."""
     if isinstance(putus, str):
-        return {putus}
-    return set(putus)
+        putus = [putus]
+    # Id dari input manual (" int-1 ") dirapikan seperti id di tabel; None/teks kosong bukan kabel.
+    return {p.strip() if isinstance(p, str) else p for p in putus} - {None, ""}
 
 
 def jarak_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
