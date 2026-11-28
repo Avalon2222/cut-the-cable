@@ -16,6 +16,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.wilayah import tentukan_wilayah
+
 DATA = Path(__file__).resolve().parents[1] / "data"
 
 LABEL_KATEGORI = {
@@ -117,6 +119,13 @@ def muat_semua(folder: Path = DATA) -> Data:
     # Graf membandingkan negara == "Indonesia" persis; "Indonesia " dari suntingan manual
     # membuat landing dalam negeri terhitung sebagai luar negeri.
     landing["negara"] = landing["negara"].where(landing["negara"].isna(), landing["negara"].astype(str).str.strip())
+    # Landing Indonesia yang wilayahnya kosong (baris baru dari suntingan manual) tetap bisa ditentukan
+    # dari koordinatnya; dulu ia terkumpul di baris "Tidak diketahui" pada ringkasan per wilayah.
+    kosong = (landing["wilayah"].astype(str).str.strip() == "") & (landing["negara"] == "Indonesia")
+    if kosong.any():
+        landing.loc[kosong, "wilayah"] = [
+            tentukan_wilayah(lat, lon) for lat, lon in zip(landing.loc[kosong, "lat"], landing.loc[kosong, "lon"])
+        ]
     return Data(kabel=kabel, landing=landing, relasi=relasi, geo=geo, meta=meta)
 
 
