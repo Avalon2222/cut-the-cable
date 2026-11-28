@@ -92,7 +92,10 @@ def muat_semua(folder: Path = DATA) -> Data:
     landing = landing.drop_duplicates("id", keep="first").reset_index(drop=True)
     # Urutan pendaratan harus angka; satu sel teks membuat kolomnya teks dan "10" tersortir sebelum "2".
     relasi["urutan"] = pd.to_numeric(relasi["urutan"], errors="coerce")
-    kabel["panjang_km"] = pd.to_numeric(kabel["panjang_km"], errors="coerce")
+    panjang = pd.to_numeric(kabel["panjang_km"], errors="coerce")
+    # Panjang 0 adalah tanda "belum diisi" di sumbernya, dan panjang negatif atau tak hingga bukan
+    # ukuran kabel; dulu ikut dijumlahkan dan tampil "0 km" seolah kabel benar-benar sependek itu.
+    kabel["panjang_km"] = panjang.where(np.isfinite(panjang) & (panjang > 0))
     # Status dan kategori dibandingkan persis ("aktif", "internasional"); suntingan manual seperti
     # "Aktif " atau "INTERNASIONAL" jangan sampai membuat kabel keluar dari graf diam-diam.
     for kolom in ("status", "kategori"):

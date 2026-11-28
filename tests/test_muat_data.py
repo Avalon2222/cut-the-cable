@@ -195,3 +195,18 @@ def test_id_kabel_dan_landing_dobel_dipakai_sekali(tmp_path):
     assert len(d.kabel) == len(asli.kabel) and d.kabel["id"].is_unique
     assert len(d.landing) == len(asli.landing) and d.landing["id"].is_unique
     assert jaringan.simulasi(d, [])["id"].is_unique
+
+
+def test_panjang_kabel_nol_negatif_atau_tak_hingga_jadi_kosong(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    kabel = pd.read_csv(folder / "kabel.csv")
+    kabel["panjang_km"] = kabel["panjang_km"].astype(object)
+    kabel.loc[0, "panjang_km"] = 0
+    kabel.loc[1, "panjang_km"] = -120
+    kabel.loc[2, "panjang_km"] = "inf"
+    kabel.loc[3, "panjang_km"] = 450.5
+    kabel.to_csv(folder / "kabel.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert d.kabel["panjang_km"].iloc[:3].isna().all()
+    assert d.kabel["panjang_km"].iloc[3] == 450.5
