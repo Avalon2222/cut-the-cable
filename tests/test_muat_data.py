@@ -210,3 +210,18 @@ def test_panjang_kabel_nol_negatif_atau_tak_hingga_jadi_kosong(tmp_path):
     d = muat_data.muat_semua(folder)
     assert d.kabel["panjang_km"].iloc[:3].isna().all()
     assert d.kabel["panjang_km"].iloc[3] == 450.5
+
+
+def test_wilayah_landing_indonesia_kosong_diisi_dari_koordinat(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    landing = pd.read_csv(folder / "landing_station.csv")
+    baru = {k: "" for k in landing.columns}
+    baru.update({"id": "uji-makassar", "nama": "Makassar, Indonesia", "kota": "Makassar", "negara": "Indonesia",
+                 "lat": -5.13, "lon": 119.42, "wilayah": ""})
+    luar = {**baru, "id": "uji-darwin", "nama": "Darwin, Australia", "negara": "Australia", "lat": -12.45, "lon": 130.84}
+    pd.concat([landing, pd.DataFrame([baru, luar])]).to_csv(folder / "landing_station.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    l = d.landing.set_index("id")
+    assert l.loc["uji-makassar", "wilayah"] == "Sulawesi"
+    assert l.loc["uji-darwin", "wilayah"] == ""
