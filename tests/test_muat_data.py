@@ -225,3 +225,16 @@ def test_wilayah_landing_indonesia_kosong_diisi_dari_koordinat(tmp_path):
     l = d.landing.set_index("id")
     assert l.loc["uji-makassar", "wilayah"] == "Sulawesi"
     assert l.loc["uji-darwin", "wilayah"] == ""
+
+
+def test_relasi_tanpa_id_kabel_atau_landing_dibuang(tmp_path):
+    folder = tmp_path / "data"
+    shutil.copytree(muat_data.DATA, folder)
+    relasi = pd.read_csv(folder / "kabel_landing.csv")
+    kabel_uji = relasi["id_kabel"].iloc[0]
+    tambahan = pd.DataFrame([{"id_kabel": kabel_uji, "id_landing": None, "urutan": 9},
+                             {"id_kabel": None, "id_landing": relasi["id_landing"].iloc[0], "urutan": 0}])
+    pd.concat([relasi, tambahan]).to_csv(folder / "kabel_landing.csv", index=False)
+    d = muat_data.muat_semua(folder)
+    assert len(d.relasi) == len(relasi)
+    assert all(isinstance(x, str) for x in d.landing_dari_kabel(kabel_uji))
